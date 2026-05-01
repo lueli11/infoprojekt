@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>r/Technologie – Temu Reddit</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #dae0e6;
+      color: #1c1c1c;
+    }
+
+    /* ─── NAVBAR ─────────────────────────────────────────────── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: #fff;
+      border-bottom: 1px solid #edeff1;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      gap: 16px;
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 800;
+      font-size: 18px;
+      color: #ff4500;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .nav-logo svg { width: 32px; height: 32px; }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-left: auto;
+    }
+
+    .btn {
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid #0079d3;
+      color: #0079d3;
+    }
+
+    .btn-primary { background: #ff4500; color: #fff; }
+    .btn-outline:hover { background: #e8f0fe; }
+    .btn-primary:hover { background: #e03d00; }
+
+    /* ─── SUBREDDIT HEADER ───────────────────────────────────── */
+    .sub-banner {
+      height: 80px;
+      background: linear-gradient(135deg, #1a3a5c 0%, #0079d3 100%);
+    }
+
+    .sub-header-bar {
+      background: #fff;
+      border-bottom: 1px solid #edeff1;
+      margin-bottom: 20px;
+    }
+
+    .sub-header-inner {
+      max-width: 740px;
+      margin: 0 auto;
+      padding: 0 20px 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      position: relative;
+      top: -20px;
+    }
+
+    .sub-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #ff4500, #ff6534);
+      border: 3px solid #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+
+    .sub-info h1 { font-size: 20px; font-weight: 800; }
+    .sub-info .sub-name { font-size: 13px; color: #878a8c; }
+
+    .sub-join {
+      margin-left: auto;
+      padding-top: 20px;
+    }
+
+    /* ─── LAYOUT ──────────────────────────────────────────────── */
+    .layout {
+      max-width: 740px;
+      margin: 0 auto;
+      padding: 0 20px 40px;
+    }
+
+    /* ─── FEED TABS ───────────────────────────────────────────── */
+    .feed-tabs {
+      background: #fff;
+      border-radius: 4px;
+      padding: 10px 12px;
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+      border: 1px solid #ccc;
+    }
+
+    .tab {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 12px;
+      border-radius: 2px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #878a8c;
+      cursor: pointer;
+      border: none;
+      background: none;
+    }
+
+    .tab:hover, .tab.active { background: #e8e8e8; color: #1c1c1c; }
+
+    /* ─── POST CARD ───────────────────────────────────────────── */
+    .post-card {
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: border-color .1s;
+    }
+
+    .post-card:hover { border-color: #818384; }
+
+    .post-body { padding: 12px; }
+
+    .post-meta {
+      font-size: 12px;
+      color: #878a8c;
+      margin-bottom: 6px;
+    }
+
+    .post-title {
+      font-size: 18px;
+      font-weight: 500;
+      margin-bottom: 6px;
+      line-height: 1.3;
+    }
+
+    .post-image {
+      width: 100%;
+      height: 200px;
+      border-radius: 4px;
+      margin-bottom: 8px;
+      background: #dae0e6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #878a8c;
+      font-size: 13px;
+    }
+
+    .post-actions { display: flex; gap: 4px; }
+
+    .action-btn {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 8px;
+      border-radius: 2px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #878a8c;
+      cursor: pointer;
+      border: none;
+      background: none;
+    }
+
+    .action-btn:hover { background: #e8e8e8; color: #1c1c1c; }
+  </style>
+</head>
+<body>
+
+<!-- ── NAVBAR ── -->
+<nav>
+  <a class="nav-logo" href="idee startseite.html">
+    <svg viewBox="0 0 20 20" fill="#ff4500" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="10" cy="10" r="10"/>
+      <path d="M16.67 10a1.46 1.46 0 00-2.47-1 7.12 7.12 0 00-3.85-1.23l.65-3.08 2.13.45a1 1 0 102.07-.1 1 1 0 00-1.9.46l-2.38-.5a.27.27 0 00-.32.2l-.73 3.44a7.14 7.14 0 00-3.89 1.23 1.46 1.46 0 10-1.61 2.39 2.87 2.87 0 000 .44c0 2.24 2.61 4.06 5.83 4.06s5.83-1.82 5.83-4.06a2.87 2.87 0 000-.44 1.46 1.46 0 00.55-1.26zM7.27 11a1 1 0 111 1 1 1 0 01-1-1zm5.58 2.71a3.58 3.58 0 01-2.85.79 3.58 3.58 0 01-2.85-.79.26.26 0 01.37-.37 3.07 3.07 0 002.48.61 3.07 3.07 0 002.48-.61.26.26 0 01.37.37zm-.17-1.71a1 1 0 111-1 1 1 0 01-1 1z" fill="#fff"/>
+    </svg>
+    Temu Reddit
+  </a>
+  <div class="nav-actions">
+    <button class="btn btn-outline">Anmelden</button>
+    <button class="btn btn-primary">Registrieren</button>
+  </div>
+</nav>
+
+<!-- ── SUBREDDIT HEADER ── -->
+<div class="sub-banner"></div>
+<div class="sub-header-bar">
+  <div class="sub-header-inner">
+    <div class="sub-icon">💻</div>
+    <div class="sub-info">
+      <h1>Technologie</h1>
+      <div class="sub-name">r/Technologie</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── FEED ── -->
+<div class="layout">
+
+
+  <article class="post-card">
+    <div class="post-body">
+      <div class="post-meta">gepostet von u/jonas_dev</div>
+      <h2 class="post-title">Neues Vue 4 Release: Was ändert sich für Entwickler?</h2>
+      <div class="post-image">[ Beitragsbild / Vorschau ]</div>
+      <div class="post-actions">
+        <button class="action-btn">💬 234 Kommentare</button>
+      </div>
+    </div>
+  </article>
+
+  <article class="post-card">
+    <div class="post-body">
+      <div class="post-meta">gepostet von u/tech_enthusiast</div>
+      <h2 class="post-title">Welches Framework nutzt ihr 2025 für neue Projekte?</h2>
+      <div class="post-actions">
+        <button class="action-btn">💬 312 Kommentare</button>
+      </div>
+    </div>
+  </article>
+
+  <article class="post-card">
+    <div class="post-body">
+      <div class="post-meta">gepostet von u/coder_ch</div>
+      <h2 class="post-title">Ich habe eine Open-Source Alternative zu Notion gebaut – Feedback willkommen!</h2>
+      <div class="post-image">[ Screenshot / Demo ]</div>
+      <div class="post-actions">
+        <button class="action-btn">💬 97 Kommentare</button>
+      </div>
+    </div>
+  </article>
+
+</div>
+
+</body>
+</html>
