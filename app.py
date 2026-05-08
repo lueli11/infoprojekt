@@ -3,7 +3,10 @@ from flask_cors import CORS
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from supabase import create_client
 from werkzeug.security import generate_password_hash, check_password_hash
+from dotenv import load_dotenv
 import os
+
+load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
@@ -188,5 +191,3 @@ def create_comment(thread_id):
 
 if __name__ == "__main__":
     app.run(debug=True)
-
-pw von supabase nicht löschen!!!: mcwlZMuWbeFb1zXD
