@@ -98,6 +98,20 @@
       color: #fff;
     }
 
+    /* ── Navbar ── */
+    .navbar {
+		position: sticky;
+      padding: 12px 24px;
+      background-color: #252d3a;
+      border-radius: 0 0 16px 16px;
+   	  border-bottom: 1px solid #2e3848;
+	  white-space: nowrap;
+    }
+
+    .logo {
+      width: 72px;
+      height: 60px;
+		flex: 1 0 auto;
     .btn {
       padding: 8px 18px;
       border-radius: 999px;
@@ -139,15 +153,17 @@
 
     /* ── Auth-Button (kombiniert) ── */
     .auth-btn {
-      display: flex;
-      align-items: center;
+		float: right;
+      margin-right: 0;
+	  margin-left: auto;
       background: linear-gradient(135deg, #f0a030, #e08820);
       border: none;
       border-radius: 999px;
       padding: 10px 6px;
       cursor: pointer;
-      gap: 0;
+      gap: 0px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+	  white-space: nowrap;
       transition: opacity .15s;
     }
 
@@ -157,7 +173,7 @@
       color: #fff;
       font-size: 15px;
       font-weight: 600;
-      padding: 0 14px;
+      padding: 0 15px;
       white-space: nowrap;
     }
 
@@ -168,6 +184,33 @@
       padding: 0;
     }
 
+    /* ── Main content ── */
+    .main {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 32px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* ── Card ── */
+    .card {
+      background-color: #2a3340;
+      border-radius: 40px;
+      border: 1px solid #323d4d;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      padding: 16px 20px;
+      background-color: #303b4a;
+      border-bottom: 1px solid #3a4555;
+      gap: 16px;
+      border-radius: 40px;
     /* ── MODAL OVERLAY ──────────────────────────────────────────── */
     .modal-overlay {
       position: fixed;
