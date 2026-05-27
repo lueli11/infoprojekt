@@ -3,19 +3,98 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>App</title>
+  <title>Temu Reddit</title>
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
   <style>
-    *, *::before, *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       background-color: #1e2530;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       min-height: 100vh;
+      color: #d0d8e4;
+    }
+
+    /* ── NAVBAR ────────────────────────────────────────────────── */
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      height: 56px;
+      background-color: #252d3a;
+      border-bottom: 1px solid #2e3848;
+      gap: 16px;
+    }
+
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .logo { width: 64px; height: 44px; }
+
+    .nav-brand {
+      font-size: 17px;
+      font-weight: 700;
+      color: #f0a030;
+      white-space: nowrap;
+    }
+
+    .breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+      color: #7a8899;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    .breadcrumb span { white-space: nowrap; }
+
+    .breadcrumb .crumb {
+      cursor: pointer;
+      color: #a0b0c0;
+      transition: color .15s;
+    }
+
+    .breadcrumb .crumb:hover { color: #f0a030; }
+
+    .breadcrumb .sep { color: #3a4555; font-size: 16px; }
+
+    .nav-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+
+    .user-chip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #2a3340;
+      border: 1px solid #3a4555;
+      border-radius: 999px;
+      padding: 6px 14px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #d0d8e4;
+    }
+
+    .user-avatar-sm {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #f0a030, #e08820);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
       color: #fff;
     }
 
@@ -33,9 +112,46 @@
       width: 72px;
       height: 60px;
 		flex: 1 0 auto;
+    .btn {
+      padding: 8px 18px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: opacity .15s, transform .1s;
     }
 
-    /* fried-egg SVG logo */
+    .btn:hover { opacity: .88; }
+    .btn:active { transform: scale(.97); }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #f0a030, #e08820);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,.3);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      border: 1px solid #3a4555;
+      color: #a0b0c0;
+    }
+
+    .btn-ghost:hover { border-color: #f0a030; color: #f0a030; opacity: 1; }
+
+    .btn-danger {
+      background: transparent;
+      border: 1px solid #c0392b;
+      color: #e74c3c;
+      padding: 6px 14px;
+      font-size: 13px;
+    }
+
+    .btn-danger:hover { background: rgba(231,76,60,.1); opacity: 1; }
+
+    .btn-sm { padding: 6px 14px; font-size: 13px; }
+
+    /* ── Auth-Button (kombiniert) ── */
     .auth-btn {
 		float: right;
       margin-right: 0;
@@ -48,7 +164,10 @@
       gap: 0px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.3);
 	  white-space: nowrap;
+      transition: opacity .15s;
     }
+
+    .auth-btn:hover { opacity: .88; }
 
     .auth-btn span {
       color: #fff;
@@ -92,137 +211,970 @@
       border-bottom: 1px solid #3a4555;
       gap: 16px;
       border-radius: 40px;
+    /* ── MODAL OVERLAY ──────────────────────────────────────────── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.65);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      padding: 16px;
     }
 
-    .avatar {
-      width: 52px;
-      height: 52px;
-      border-radius: 50%;
-      background: #c8cdd5;
-      flex-shrink: 0;
-      box-shadow: inset 0 2px 4px rgba(0,0,0,0.2), 0 2px 6px rgba(0,0,0,0.3);
+    .modal {
+      background: #252d3a;
+      border: 1px solid #3a4555;
+      border-radius: 20px;
+      width: 100%;
+      max-width: 420px;
+      padding: 32px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.5);
     }
 
-    .card-title {
-      font-size: 16px;
-      font-weight: 600;
+    .modal-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 24px;
       color: #d0d8e4;
     }
 
-    .card-subtitle {
-      font-size: 13px;
-      color: #7a8899;
-      margin-top: 3px;
+    .tab-row {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 24px;
+      background: #1e2530;
+      border-radius: 999px;
+      padding: 4px;
     }
 
-    .card-body {
-      padding: 20px;
-      min-height: 120px;
-      color: #7a8899;
+    .tab-btn {
+      flex: 1;
+      padding: 8px;
+      border: none;
+      border-radius: 999px;
       font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .15s, color .15s;
+      background: transparent;
+      color: #7a8899;
+    }
+
+    .tab-btn.active {
+      background: linear-gradient(135deg, #f0a030, #e08820);
+      color: #fff;
+    }
+
+    .form-group { margin-bottom: 16px; }
+
+    .form-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: #7a8899;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 11px 14px;
+      background: #1e2530;
+      border: 1px solid #3a4555;
+      border-radius: 10px;
+      font-size: 14px;
+      color: #d0d8e4;
+      outline: none;
+      transition: border-color .15s;
+    }
+
+    .form-input:focus { border-color: #f0a030; }
+    .form-input::placeholder { color: #4a5568; }
+
+    .form-textarea {
+      resize: vertical;
+      min-height: 90px;
+    }
+
+    .error-msg {
+      background: rgba(231,76,60,.15);
+      border: 1px solid #c0392b;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 13px;
+      color: #e74c3c;
+      margin-bottom: 16px;
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 24px;
+    }
+
+    /* ── MAIN CONTENT ───────────────────────────────────────────── */
+    .main {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 32px 16px;
+    }
+
+    /* ── LOADING / EMPTY ────────────────────────────────────────── */
+    .loading-box, .empty-box {
+      text-align: center;
+      padding: 60px 20px;
+      color: #4a5568;
+      font-size: 15px;
+    }
+
+    .spinner {
+      width: 36px;
+      height: 36px;
+      border: 3px solid #3a4555;
+      border-top-color: #f0a030;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      margin: 0 auto 16px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── SECTION HEADER ─────────────────────────────────────────── */
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .section-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #d0d8e4;
+    }
+
+    /* ── SUBREDDIT CARDS (Home View) ────────────────────────────── */
+    .subreddit-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 16px;
+    }
+
+    .sub-card {
+      background: #2a3340;
+      border: 1px solid #323d4d;
+      border-radius: 16px;
+      padding: 20px;
+      cursor: pointer;
+      transition: border-color .15s, transform .15s, box-shadow .15s;
+      box-shadow: 0 4px 16px rgba(0,0,0,.2);
+    }
+
+    .sub-card:hover {
+      border-color: #f0a030;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0,0,0,.3);
+    }
+
+    .sub-card-head {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 12px;
+    }
+
+    .sub-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #f0a030, #e08820);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: 800;
+      color: #fff;
+      flex-shrink: 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,.3);
+    }
+
+    .sub-name {
+      font-size: 16px;
+      font-weight: 700;
+      color: #d0d8e4;
+    }
+
+    .sub-handle {
+      font-size: 12px;
+      color: #7a8899;
+      margin-top: 2px;
+    }
+
+    .sub-desc {
+      font-size: 13px;
+      color: #7a8899;
+      line-height: 1.5;
+    }
+
+    /* ── SUBREDDIT VIEW HEADER ──────────────────────────────────── */
+    .sub-banner {
+      height: 90px;
+      background: linear-gradient(135deg, #1a3a5c 0%, #f0a030 100%);
+      border-radius: 16px 16px 0 0;
+      margin-bottom: 0;
+    }
+
+    .sub-header {
+      background: #252d3a;
+      border: 1px solid #323d4d;
+      border-top: none;
+      border-radius: 0 0 16px 16px;
+      padding: 16px 24px 20px;
+      display: flex;
+      align-items: flex-end;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .sub-header-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #f0a030, #e08820);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      font-weight: 800;
+      color: #fff;
+      border: 3px solid #252d3a;
+      margin-top: -30px;
+      flex-shrink: 0;
+      box-shadow: 0 4px 12px rgba(0,0,0,.4);
+    }
+
+    .sub-header-info { flex: 1; min-width: 0; }
+
+    .sub-header-title {
+      font-size: 22px;
+      font-weight: 800;
+      color: #d0d8e4;
+    }
+
+    .sub-header-sub {
+      font-size: 13px;
+      color: #7a8899;
+      margin-top: 2px;
+    }
+
+    /* ── THREAD CARDS ───────────────────────────────────────────── */
+    .thread-card {
+      background: #2a3340;
+      border: 1px solid #323d4d;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      transition: border-color .15s, box-shadow .15s;
+      box-shadow: 0 4px 16px rgba(0,0,0,.2);
+    }
+
+    .thread-card:hover {
+      border-color: #f0a030;
+      box-shadow: 0 6px 20px rgba(0,0,0,.3);
+    }
+
+    .thread-meta {
+      font-size: 12px;
+      color: #7a8899;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .thread-meta .author { color: #a0b0c0; font-weight: 600; }
+
+    .thread-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #d0d8e4;
+      line-height: 1.4;
+      margin-bottom: 8px;
+    }
+
+    .thread-preview {
+      font-size: 13px;
+      color: #7a8899;
+      line-height: 1.5;
+      margin-bottom: 12px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .thread-footer {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: #7a8899;
+    }
+
+    .thread-action {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: none;
+      background: #1e2530;
+      color: #7a8899;
+      font-size: 12px;
+      cursor: pointer;
+      transition: background .15s, color .15s;
+    }
+
+    .thread-action:hover { background: #303b4a; color: #d0d8e4; }
+
+    /* ── NEW THREAD FORM ────────────────────────────────────────── */
+    .create-box {
+      background: #2a3340;
+      border: 1px solid #323d4d;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 16px rgba(0,0,0,.2);
+    }
+
+    .create-box-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #d0d8e4;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* ── THREAD DETAIL ──────────────────────────────────────────── */
+    .thread-detail {
+      background: #2a3340;
+      border: 1px solid #323d4d;
+      border-radius: 16px;
+      padding: 28px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 16px rgba(0,0,0,.2);
+    }
+
+    .thread-detail-meta {
+      font-size: 13px;
+      color: #7a8899;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .thread-detail-meta .author { color: #f0a030; font-weight: 600; }
+
+    .thread-detail-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: #d0d8e4;
+      line-height: 1.3;
+      margin-bottom: 14px;
+    }
+
+    .thread-detail-content {
+      font-size: 15px;
+      color: #a0b0c0;
+      line-height: 1.65;
+      white-space: pre-wrap;
+    }
+
+    /* ── COMMENTS ───────────────────────────────────────────────── */
+    .comment-section-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #7a8899;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+
+    .comment-write {
+      background: #2a3340;
+      border: 1px solid #323d4d;
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .comment-write textarea {
+      width: 100%;
+      background: #1e2530;
+      border: 1px solid #3a4555;
+      border-radius: 10px;
+      color: #d0d8e4;
+      font-size: 14px;
+      font-family: inherit;
+      padding: 10px 14px;
+      min-height: 80px;
+      resize: vertical;
+      outline: none;
+      transition: border-color .15s;
+    }
+
+    .comment-write textarea:focus { border-color: #f0a030; }
+    .comment-write textarea::placeholder { color: #4a5568; }
+
+    .comment-write-footer {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 10px;
+    }
+
+    .comment {
+      background: #2a3340;
+      border: 1px solid #323d4d;
+      border-left: 3px solid #f0a030;
+      border-radius: 0 12px 12px 0;
+      padding: 14px 18px;
+      margin-bottom: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.15);
+    }
+
+    .comment-meta {
+      font-size: 12px;
+      color: #7a8899;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .comment-meta .author { color: #a0b0c0; font-weight: 700; }
+
+    .comment-text {
+      font-size: 14px;
+      color: #c0ccd8;
       line-height: 1.6;
     }
 
-    /* ── Responsive ── */
+    /* ── BACK BUTTON ────────────────────────────────────────────── */
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: #7a8899;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 6px 0;
+      margin-bottom: 16px;
+      transition: color .15s;
+    }
+
+    .back-btn:hover { color: #f0a030; }
+
+    /* ── AUTH REQUIRED HINT ─────────────────────────────────────── */
+    .auth-hint {
+      background: #252d3a;
+      border: 1px solid #3a4555;
+      border-radius: 12px;
+      padding: 14px 18px;
+      font-size: 13px;
+      color: #7a8899;
+      margin-bottom: 16px;
+    }
+
+    .auth-hint a {
+      color: #f0a030;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    /* ── RESPONSIVE ─────────────────────────────────────────────── */
     @media (max-width: 600px) {
-      .navbar {
-        padding: 10px 16px;
-      }
-
-      .auth-btn span {
-        font-size: 13px;
-        padding: 0 10px;
-      }
-
-      .main {
-        padding: 20px 12px;
-        gap: 16px;
-      }
-
-      .card-header {
-        padding: 14px 16px;
-      }
-
-      .avatar {
-        width: 42px;
-        height: 42px;
-      }
-
-      .card-title {
-        font-size: 15px;
-      }
+      .navbar { padding: 0 14px; gap: 8px; }
+      .nav-brand { display: none; }
+      .subreddit-grid { grid-template-columns: 1fr; }
+      .main { padding: 20px 12px; }
+      .thread-detail { padding: 18px; }
+      .thread-detail-title { font-size: 18px; }
     }
   </style>
 </head>
 <body>
   <div id="app">
-    <!-- Navbar -->
-    <nav class="navbar">
-      <!-- Fried egg logo as inline SVG -->
-      <svg class="logo" viewBox="0 0 80 50" xmlns="http://www.w3.org/2000/svg">
-        <!-- egg white (ellipse, slightly tilted) -->
-        <ellipse cx="38" cy="30" rx="34" ry="16" fill="#e8e8e8" />
-        <!-- yolk -->
-        <circle cx="32" cy="25" r="14" fill="#f0a030" />
-      </svg>
 
-      <!-- Register | Login button -->
-      <button class="auth-btn" @click="handleAuth">
-        <span>Register</span>
-        <span class="divider"></span>
-        <span>Login</span>
-      </button>
+    <!-- ── NAVBAR ── -->
+    <nav class="navbar">
+      <div class="nav-left" @click="goHome">
+        <svg class="logo" viewBox="0 0 80 50" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="38" cy="30" rx="34" ry="16" fill="#e8e8e8" />
+          <circle cx="32" cy="25" r="14" fill="#f0a030" />
+        </svg>
+        <span class="nav-brand">Temu Reddit</span>
+      </div>
+
+      <!-- Breadcrumb -->
+      <div class="breadcrumb" v-if="currentView !== 'home'">
+        <span class="crumb" @click="goHome">🏠 Home</span>
+        <span class="sep" v-if="currentSubreddit">›</span>
+        <span class="crumb" v-if="currentSubreddit" @click="goToSubreddit(currentSubreddit)">
+          r/{{ currentSubreddit.name }}
+        </span>
+        <span class="sep" v-if="currentView === 'thread'">›</span>
+        <span v-if="currentView === 'thread'" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:180px;">
+          {{ currentThread && currentThread.title }}
+        </span>
+      </div>
+
+      <!-- Nav Right -->
+      <div class="nav-right">
+        <template v-if="currentUser">
+          <div class="user-chip">
+            <div class="user-avatar-sm">{{ currentUser.username[0].toUpperCase() }}</div>
+            <span>{{ currentUser.username }}</span>
+          </div>
+          <button class="btn btn-danger" @click="logout">Abmelden</button>
+        </template>
+        <template v-else>
+          <button class="auth-btn" @click="openAuth('login')">
+            <span>Register</span>
+            <span class="divider"></span>
+            <span>Login</span>
+          </button>
+        </template>
+      </div>
     </nav>
 
-    <!-- Item list -->
-    <main class="main">
-      <div class="card" v-for="item in items" :key="item.id">
-        <div class="card-header">
-          <div class="avatar"></div>
-          <div>
-            <div class="card-title">{{ item.title }}</div>
-            <div class="card-subtitle">{{ item.subtitle }}</div>
-          </div>
+    <!-- ── AUTH MODAL ── -->
+    <div class="modal-overlay" v-if="showAuthModal" @click.self="showAuthModal = false">
+      <div class="modal">
+        <div class="modal-title">{{ authMode === 'login' ? 'Willkommen zurück' : 'Konto erstellen' }}</div>
+
+        <div class="tab-row">
+          <button class="tab-btn" :class="{ active: authMode === 'login' }" @click="authMode = 'login'">Anmelden</button>
+          <button class="tab-btn" :class="{ active: authMode === 'register' }" @click="authMode = 'register'">Registrieren</button>
         </div>
-        <div class="card-body">
-          {{ item.description }}
+
+        <div class="error-msg" v-if="authError">{{ authError }}</div>
+
+        <div class="form-group" v-if="authMode === 'register'">
+          <label class="form-label">Benutzername</label>
+          <input class="form-input" v-model="authForm.username" placeholder="z.B. jonas_dev" @keyup.enter="submitAuth" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">E-Mail</label>
+          <input class="form-input" type="email" v-model="authForm.email" placeholder="deine@email.ch" @keyup.enter="submitAuth" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Passwort</label>
+          <input class="form-input" type="password" v-model="authForm.password" placeholder="••••••••" @keyup.enter="submitAuth" />
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn-ghost" @click="showAuthModal = false">Abbrechen</button>
+          <button class="btn btn-primary" @click="submitAuth" :disabled="authLoading">
+            {{ authLoading ? 'Lädt...' : (authMode === 'login' ? 'Anmelden' : 'Konto erstellen') }}
+          </button>
         </div>
       </div>
+    </div>
+
+    <!-- ── MAIN CONTENT ── -->
+    <main class="main">
+
+      <!-- ═══ HOME VIEW ═══ -->
+      <div v-if="currentView === 'home'">
+        <div class="section-header">
+          <div class="section-title">Communities</div>
+        </div>
+
+        <div class="loading-box" v-if="loading">
+          <div class="spinner"></div>
+          Lädt...
+        </div>
+
+        <div class="subreddit-grid" v-else-if="subreddits.length">
+          <div class="sub-card" v-for="sub in subreddits" :key="sub.id" @click="goToSubreddit(sub)">
+            <div class="sub-card-head">
+              <div class="sub-icon">{{ sub.name[0].toUpperCase() }}</div>
+              <div>
+                <div class="sub-name">{{ sub.name }}</div>
+                <div class="sub-handle">r/{{ sub.name }}</div>
+              </div>
+            </div>
+            <div class="sub-desc">{{ sub.description || 'Keine Beschreibung vorhanden.' }}</div>
+          </div>
+        </div>
+
+        <div class="empty-box" v-else>
+          Noch keine Communities vorhanden.
+        </div>
+      </div>
+
+      <!-- ═══ SUBREDDIT VIEW ═══ -->
+      <div v-if="currentView === 'subreddit'">
+        <div v-if="currentSubreddit">
+          <!-- Banner + Header -->
+          <div class="sub-banner"></div>
+          <div class="sub-header">
+            <div class="sub-header-icon">{{ currentSubreddit.name[0].toUpperCase() }}</div>
+            <div class="sub-header-info">
+              <div class="sub-header-title">{{ currentSubreddit.name }}</div>
+              <div class="sub-header-sub">r/{{ currentSubreddit.name }} · {{ currentSubreddit.description || '' }}</div>
+            </div>
+            <button class="btn btn-primary btn-sm" v-if="currentUser" @click="showNewThreadForm = !showNewThreadForm">
+              {{ showNewThreadForm ? '✕ Abbrechen' : '+ Neuer Thread' }}
+            </button>
+          </div>
+
+          <!-- Neuer Thread Formular -->
+          <div class="create-box" v-if="showNewThreadForm">
+            <div class="create-box-title">Neuen Thread erstellen</div>
+            <div class="form-group">
+              <label class="form-label">Titel</label>
+              <input class="form-input" v-model="newThread.title" placeholder="Worüber möchtest du schreiben?" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Inhalt (optional)</label>
+              <textarea class="form-input form-textarea" v-model="newThread.content" placeholder="Beschreibe deinen Beitrag..."></textarea>
+            </div>
+            <div style="display:flex;justify-content:flex-end;gap:8px">
+              <button class="btn btn-ghost" @click="showNewThreadForm = false">Abbrechen</button>
+              <button class="btn btn-primary" @click="createThread" :disabled="!newThread.title.trim() || postLoading">
+                {{ postLoading ? 'Wird veröffentlicht...' : 'Veröffentlichen' }}
+              </button>
+            </div>
+          </div>
+
+          <!-- Thread Liste -->
+          <div class="loading-box" v-if="loading">
+            <div class="spinner"></div>
+            Lädt Threads...
+          </div>
+
+          <div v-else-if="threads.length">
+            <div class="thread-card" v-for="t in threads" :key="t.id" @click="goToThread(t)">
+              <div class="thread-meta">
+                <span class="author">u/{{ t.users?.username || 'unbekannt' }}</span>
+                <span>·</span>
+                <span>{{ formatDate(t.created_at) }}</span>
+              </div>
+              <div class="thread-title">{{ t.title }}</div>
+              <div class="thread-preview" v-if="t.content">{{ t.content }}</div>
+              <div class="thread-footer">
+                <button class="thread-action">💬 Kommentare</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="empty-box" v-else>
+            😶 Noch keine Threads in dieser Community.
+          </div>
+
+          <!-- Auth Hint -->
+          <div class="auth-hint" v-if="!currentUser">
+            <a @click="openAuth('login')">Melde dich an</a>, um neue Threads zu erstellen.
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ THREAD VIEW ═══ -->
+      <div v-if="currentView === 'thread'">
+        <div v-if="currentThread">
+
+          <!-- Original Post -->
+          <div class="thread-detail">
+            <div class="thread-detail-meta">
+              <span>r/{{ currentThread.subreddits?.name || (currentSubreddit && currentSubreddit.name) || '?' }}</span>
+              <span>·</span>
+              <span class="author">u/{{ currentThread.users?.username || 'unbekannt' }}</span>
+              <span>·</span>
+              <span>{{ formatDate(currentThread.created_at) }}</span>
+            </div>
+            <div class="thread-detail-title">{{ currentThread.title }}</div>
+            <div class="thread-detail-content" v-if="currentThread.content">{{ currentThread.content }}</div>
+          </div>
+
+          <!-- Kommentar schreiben -->
+          <div v-if="currentUser" class="comment-write">
+            <textarea v-model="newComment" placeholder="Was denkst du?" @keydown.ctrl.enter="createComment"></textarea>
+            <div class="comment-write-footer">
+              <button class="btn btn-primary btn-sm" @click="createComment" :disabled="!newComment.trim() || commentLoading">
+                {{ commentLoading ? 'Wird gepostet...' : 'Kommentieren' }}
+              </button>
+            </div>
+          </div>
+          <div class="auth-hint" v-else>
+            <a @click="openAuth('login')">Melde dich an</a>, um zu kommentieren.
+          </div>
+
+          <!-- Kommentare -->
+          <div class="loading-box" v-if="loading">
+            <div class="spinner"></div>
+            Lädt Kommentare...
+          </div>
+
+          <div v-else>
+            <div class="comment-section-title" v-if="comments.length">
+              {{ comments.length }} Kommentar{{ comments.length !== 1 ? 'e' : '' }}
+            </div>
+            <div class="comment" v-for="c in comments" :key="c.id">
+              <div class="comment-meta">
+                <span class="author">u/{{ c.users?.username || 'unbekannt' }}</span>
+                <span>·</span>
+                <span>{{ formatDate(c.created_at) }}</span>
+              </div>
+              <div class="comment-text">{{ c.content }}</div>
+            </div>
+            <div class="empty-box" v-if="!comments.length" style="padding:24px">
+              Sei der Erste, der kommentiert!
+            </div>
+          </div>
+
+        </div>
+      </div>
+
     </main>
   </div>
 
   <script>
+    // Leer = relative URLs → funktioniert lokal (Flask) UND in Produktion
+    const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:8080' : ''
     const { createApp } = Vue
 
     createApp({
       data() {
         return {
-          items: [
-            {
-              id: 1,
-              title: 'Eintrag Nummer Eins',
-              subtitle: 'Erstellt am 22. Mai 2026',
-              description: 'Dies ist die Beschreibung des ersten Eintrags. Hier können beliebige Inhalte angezeigt werden.',
-            },
-            {
-              id: 2,
-              title: 'Eintrag Nummer Zwei',
-              subtitle: 'Erstellt am 21. Mai 2026',
-              description: 'Hier steht der Inhalt des zweiten Eintrags. Die Liste wird dynamisch mit Vue.js gerendert.',
-            },
-            {
-              id: 3,
-              title: 'Eintrag Nummer Drei',
-              subtitle: 'Erstellt am 20. Mai 2026',
-              description: 'Ein weiterer Eintrag in der Liste. Das Design passt sich auf kleinen Bildschirmen automatisch an.',
-            },
-          ]
+          currentView: 'home',
+          currentUser: null,
+          token: null,
+          showAuthModal: false,
+          authMode: 'login',
+          authForm: { username: '', email: '', password: '' },
+          authError: '',
+          authLoading: false,
+          subreddits: [],
+          currentSubreddit: null,
+          threads: [],
+          currentThread: null,
+          comments: [],
+          showNewThreadForm: false,
+          newThread: { title: '', content: '' },
+          newComment: '',
+          loading: false,
+          postLoading: false,
+          commentLoading: false,
         }
       },
-      methods: {
-        handleAuth() {
-          alert('Auth-Aktion ausgelöst')
+
+      mounted() {
+        const token = localStorage.getItem('token')
+        const user  = localStorage.getItem('user')
+        if (token && user) {
+          this.token = token
+          this.currentUser = JSON.parse(user)
         }
+        this.fetchSubreddits()
+      },
+
+      methods: {
+        /* ── API HELPER ── */
+        async api(path, options = {}) {
+          const headers = { 'Content-Type': 'application/json', ...options.headers }
+          if (this.token) headers['Authorization'] = `Bearer ${this.token}`
+          const res = await fetch(API_BASE + path, { ...options, headers })
+          const data = await res.json().catch(() => ({}))
+          if (!res.ok) throw new Error(data.fehler || `Fehler ${res.status}`)
+          return data
+        },
+
+        /* ── DATA FETCHING ── */
+        async fetchSubreddits() {
+          this.loading = true
+          try {
+            this.subreddits = await this.api('/subreddits')
+          } catch (e) {
+            console.error('Subreddits laden:', e)
+          } finally {
+            this.loading = false
+          }
+        },
+
+        async fetchThreads(subredditId) {
+          this.loading = true
+          try {
+            this.threads = await this.api(`/subreddits/${subredditId}/threads`)
+          } catch (e) {
+            console.error('Threads laden:', e)
+          } finally {
+            this.loading = false
+          }
+        },
+
+        async fetchThread(threadId) {
+          this.loading = true
+          try {
+            this.currentThread = await this.api(`/threads/${threadId}`)
+          } catch (e) {
+            console.error('Thread laden:', e)
+          } finally {
+            this.loading = false
+          }
+        },
+
+        async fetchComments(threadId) {
+          try {
+            this.comments = await this.api(`/threads/${threadId}/comments`)
+          } catch (e) {
+            console.error('Kommentare laden:', e)
+          }
+        },
+
+        /* ── NAVIGATION ── */
+        goHome() {
+          this.currentView = 'home'
+          this.currentSubreddit = null
+          this.currentThread = null
+          this.showNewThreadForm = false
+          if (!this.subreddits.length) this.fetchSubreddits()
+        },
+
+        async goToSubreddit(sub) {
+          this.currentSubreddit = sub
+          this.currentThread = null
+          this.showNewThreadForm = false
+          this.newThread = { title: '', content: '' }
+          this.currentView = 'subreddit'
+          await this.fetchThreads(sub.id)
+        },
+
+        async goToThread(thread) {
+          this.currentView = 'thread'
+          this.newComment = ''
+          this.comments = []
+          await this.fetchThread(thread.id)
+          await this.fetchComments(thread.id)
+        },
+
+        /* ── AUTH ── */
+        openAuth(mode) {
+          this.authMode = mode
+          this.authError = ''
+          this.authForm = { username: '', email: '', password: '' }
+          this.showAuthModal = true
+        },
+
+        async submitAuth() {
+          this.authError = ''
+          this.authLoading = true
+          try {
+            if (this.authMode === 'register') {
+              if (!this.authForm.username || !this.authForm.email || !this.authForm.password) {
+                this.authError = 'Bitte alle Felder ausfüllen.'
+                return
+              }
+              await this.api('/users/register', {
+                method: 'POST',
+                body: JSON.stringify({
+                  username: this.authForm.username,
+                  email:    this.authForm.email,
+                  password: this.authForm.password,
+                })
+              })
+              // Nach Register direkt einloggen
+              this.authMode = 'login'
+            }
+            // Login
+            if (!this.authForm.email || !this.authForm.password) {
+              this.authError = 'E-Mail und Passwort erforderlich.'
+              return
+            }
+            const result = await this.api('/auth/login', {
+              method: 'POST',
+              body: JSON.stringify({ email: this.authForm.email, password: this.authForm.password })
+            })
+            this.token = result.token
+            this.currentUser = { id: result.user_id, username: result.username }
+            localStorage.setItem('token', result.token)
+            localStorage.setItem('user', JSON.stringify(this.currentUser))
+            this.showAuthModal = false
+          } catch (e) {
+            this.authError = e.message
+          } finally {
+            this.authLoading = false
+          }
+        },
+
+        logout() {
+          this.token = null
+          this.currentUser = null
+          localStorage.removeItem('token')
+          localStorage.removeItem('user')
+        },
+
+        /* ── ACTIONS ── */
+        async createThread() {
+          if (!this.newThread.title.trim()) return
+          this.postLoading = true
+          try {
+            const created = await this.api('/threads', {
+              method: 'POST',
+              body: JSON.stringify({
+                title:        this.newThread.title.trim(),
+                content:      this.newThread.content.trim(),
+                subreddit_id: this.currentSubreddit.id,
+              })
+            })
+            this.threads.unshift({ ...created, users: { username: this.currentUser.username } })
+            this.newThread = { title: '', content: '' }
+            this.showNewThreadForm = false
+          } catch (e) {
+            alert('Fehler: ' + e.message)
+          } finally {
+            this.postLoading = false
+          }
+        },
+
+        async createComment() {
+          if (!this.newComment.trim()) return
+          this.commentLoading = true
+          try {
+            const created = await this.api(`/threads/${this.currentThread.id}/comments`, {
+              method: 'POST',
+              body: JSON.stringify({ content: this.newComment.trim() })
+            })
+            this.comments.push({ ...created, users: { username: this.currentUser.username } })
+            this.newComment = ''
+          } catch (e) {
+            alert('Fehler: ' + e.message)
+          } finally {
+            this.commentLoading = false
+          }
+        },
+
+        /* ── UTILS ── */
+        formatDate(iso) {
+          if (!iso) return ''
+          const d = new Date(iso)
+          const now = new Date()
+          const diff = Math.floor((now - d) / 1000)
+          if (diff < 60)   return 'gerade eben'
+          if (diff < 3600) return `vor ${Math.floor(diff/60)} Min.`
+          if (diff < 86400) return `vor ${Math.floor(diff/3600)} Std.`
+          return d.toLocaleDateString('de-CH', { day: 'numeric', month: 'long', year: 'numeric' })
+        },
       }
     }).mount('#app')
   </script>

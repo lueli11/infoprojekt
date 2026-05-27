@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from supabase import create_client
@@ -17,6 +17,13 @@ jwt = JWTManager(app)
 SUPABASE_URL = os.environ.get("SUPABASE_URL")
 SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+
+
+# ── FRONTEND ────────────────────────────────────────────────────────────────
+
+@app.route("/")
+def index():
+    return send_from_directory(".", "main.html")
 
 
 # ── AUTH ────────────────────────────────────────────────────────────────────
@@ -121,6 +128,18 @@ def get_threads_by_subreddit(subreddit_id):
 
 # ── THREADS ──────────────────────────────────────────────────────────────────
 
+@app.route("/threads", methods=["GET"])
+def get_threads():
+    result = (
+        supabase.table("threads")
+        .select("*, users(username), subreddits(name)")
+        .order("created_at", desc=True)
+        .limit(50)
+        .execute()
+    )
+    return jsonify(result.data)
+
+
 @app.route("/threads", methods=["POST"])
 @jwt_required()
 def create_thread():
@@ -190,4 +209,5 @@ def create_comment(thread_id):
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 8080))
+    app.run(debug=True, port=port)
