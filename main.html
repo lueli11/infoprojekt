@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vue.js App</title>
+    <title>Temu Reddit</title>
     <style>
         * {
             margin: 0;
@@ -13,14 +13,14 @@
 
         body {
             font-family: Arial, sans-serif;
-            padding: 20px;
-            background-color: #f5f5f5;
+            padding: 0px;
+            background-color: #070F2B;
         }
 
         #app {
             max-width: 800px;
             margin: 0 auto;
-            background-color: white;
+            background-color: #070F2B;
             padding: 30px;
             border-radius: 10px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -44,9 +44,32 @@
         button:hover {
             background-color: #35495e;
         }
+		
+		header {
+			width: auto;
+			background-color: #1B1A55;
+			padding: 10px;
+			border-radius: 50px;
+			outline: 2px solid #9290C3;
+		}
+		.LogInRegister {
+			padding: 5px;
+			border-radius: 50px;
+			background-color: #E6501B;
+			align-items: flex-end;
+		}
+		.LogInRegister {
+
+		}
     </style>
 </head>
 <body>
+	<header>
+		<div class="LogInRegister">
+			<a id="Register">Register</a>
+			<a id="LogIn">Log In</a>
+		</div>
+	</header>
     <div id="app">
         <h1>{{ title }}</h1>
         <p>{{ message }}</p>
