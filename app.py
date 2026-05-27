@@ -25,6 +25,10 @@ supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 def index():
     return send_from_directory(".", "main.html")
 
+@app.route("/vereinfachtindex.html")
+def vereinfacht():
+    return send_from_directory(".", "vereinfachtindex.html")
+
 
 # ── AUTH ────────────────────────────────────────────────────────────────────
 

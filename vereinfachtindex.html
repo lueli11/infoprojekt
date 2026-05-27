@@ -15,7 +15,7 @@
       color: #d0d8e4;
     }
 
-    /* ── NAVBAR ────────────────────────────────────────────────── */
+    /* Navbar */
     .navbar {
       position: sticky;
       top: 0;
@@ -70,6 +70,13 @@
 
     .breadcrumb .sep { color: #3a4555; font-size: 16px; }
 
+    .breadcrumb .current {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 180px;
+    }
+
     .nav-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 
     .user-chip {
@@ -98,6 +105,7 @@
       color: #fff;
     }
 
+    /* Buttons */
     .btn {
       padding: 8px 18px;
       border-radius: 999px;
@@ -137,37 +145,7 @@
 
     .btn-sm { padding: 6px 14px; font-size: 13px; }
 
-    /* ── Auth-Button (kombiniert) ── */
-    .auth-btn {
-      display: flex;
-      align-items: center;
-      background: linear-gradient(135deg, #f0a030, #e08820);
-      border: none;
-      border-radius: 999px;
-      padding: 10px 6px;
-      cursor: pointer;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-      transition: opacity .15s;
-    }
-
-    .auth-btn:hover { opacity: .88; }
-
-    .auth-btn span {
-      color: #fff;
-      font-size: 15px;
-      font-weight: 600;
-      padding: 0 15px;
-      white-space: nowrap;
-    }
-
-    .auth-btn .divider {
-      width: 1px;
-      height: 18px;
-      background: rgba(255,255,255,0.5);
-      padding: 0;
-    }
-
-    /* ── MODAL OVERLAY ──────────────────────────────────────────── */
+    /* Modal */
     .modal-overlay {
       position: fixed;
       inset: 0;
@@ -272,14 +250,14 @@
       margin-top: 24px;
     }
 
-    /* ── MAIN CONTENT ───────────────────────────────────────────── */
+    /* Main */
     .main {
       max-width: 860px;
       margin: 0 auto;
       padding: 32px 16px;
     }
 
-    /* ── LOADING / EMPTY ────────────────────────────────────────── */
+    /* Loading & Leer */
     .loading-box, .empty-box {
       text-align: center;
       padding: 60px 20px;
@@ -299,7 +277,6 @@
 
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ── SECTION HEADER ─────────────────────────────────────────── */
     .section-header {
       display: flex;
       align-items: center;
@@ -313,7 +290,7 @@
       color: #d0d8e4;
     }
 
-    /* ── SUBREDDIT CARDS (Home View) ────────────────────────────── */
+    /* Community-Karten (Home) */
     .subreddit-grid {
       display: flex;
       flex-direction: column;
@@ -376,7 +353,7 @@
       line-height: 1.5;
     }
 
-    /* ── SUBREDDIT VIEW HEADER ──────────────────────────────────── */
+    /* Subreddit-Header */
     .sub-banner {
       height: 90px;
       background: linear-gradient(135deg, #1a3a5c 0%, #f0a030 100%);
@@ -427,7 +404,7 @@
       margin-top: 2px;
     }
 
-    /* ── THREAD CARDS ───────────────────────────────────────────── */
+    /* Thread-Karten */
     .thread-card {
       background: #2a3340;
       border: 1px solid #323d4d;
@@ -498,7 +475,7 @@
 
     .thread-action:hover { background: #303b4a; color: #d0d8e4; }
 
-    /* ── NEW THREAD FORM ────────────────────────────────────────── */
+    /* Neuer Thread Formular */
     .create-box {
       background: #2a3340;
       border: 1px solid #323d4d;
@@ -518,7 +495,13 @@
       justify-content: space-between;
     }
 
-    /* ── THREAD DETAIL ──────────────────────────────────────────── */
+    .create-box-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    /* Thread Detail */
     .thread-detail {
       background: #2a3340;
       border: 1px solid #323d4d;
@@ -554,7 +537,7 @@
       white-space: pre-wrap;
     }
 
-    /* ── COMMENTS ───────────────────────────────────────────────── */
+    /* Kommentare */
     .comment-section-title {
       font-size: 15px;
       font-weight: 700;
@@ -623,7 +606,7 @@
       line-height: 1.6;
     }
 
-    /* ── AUTH REQUIRED HINT ─────────────────────────────────────── */
+    /* Hinweis: Login erforderlich */
     .auth-hint {
       background: #252d3a;
       border: 1px solid #3a4555;
@@ -640,7 +623,7 @@
       text-decoration: underline;
     }
 
-    /* ── RESPONSIVE ─────────────────────────────────────────────── */
+    /* Responsive */
     @media (max-width: 600px) {
       .navbar { padding: 0 14px; gap: 8px; }
       .nav-brand { display: none; }
@@ -653,7 +636,7 @@
 <body>
   <div id="app">
 
-    <!-- ── NAVBAR ── -->
+    <!-- Navbar -->
     <nav class="navbar">
       <div class="nav-left" @click="goHome">
         <svg class="logo" viewBox="0 0 80 50" xmlns="http://www.w3.org/2000/svg">
@@ -671,12 +654,12 @@
           r/{{ currentSubreddit.name }}
         </span>
         <span class="sep" v-if="currentView === 'thread'">›</span>
-        <span v-if="currentView === 'thread'" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:180px;">
+        <span class="current" v-if="currentView === 'thread'">
           {{ currentThread && currentThread.title }}
         </span>
       </div>
 
-      <!-- Nav Right -->
+      <!-- Rechte Seite: Login/User -->
       <div class="nav-right">
         <template v-if="currentUser">
           <div class="user-chip">
@@ -686,16 +669,13 @@
           <button class="btn btn-danger" @click="logout">Abmelden</button>
         </template>
         <template v-else>
-          <button class="auth-btn" @click="openAuth('login')">
-            <span>Register</span>
-            <span class="divider"></span>
-            <span>Login</span>
-          </button>
+          <button class="btn btn-ghost btn-sm" @click="openAuth('register')">Registrieren</button>
+          <button class="btn btn-primary btn-sm" @click="openAuth('login')">Anmelden</button>
         </template>
       </div>
     </nav>
 
-    <!-- ── AUTH MODAL ── -->
+    <!-- Auth Modal -->
     <div class="modal-overlay" v-if="showAuthModal" @click.self="showAuthModal = false">
       <div class="modal">
         <div class="modal-title">{{ authMode === 'login' ? 'Willkommen zurück' : 'Konto erstellen' }}</div>
@@ -709,30 +689,30 @@
 
         <div class="form-group" v-if="authMode === 'register'">
           <label class="form-label">Benutzername</label>
-          <input class="form-input" v-model="authForm.username" placeholder="z.B. jonas_dev" @keyup.enter="submitAuth" />
+          <input class="form-input" v-model="authForm.username" placeholder="z.B. jonas_dev" @keyup.enter="submitForm" />
         </div>
         <div class="form-group">
           <label class="form-label">E-Mail</label>
-          <input class="form-input" type="email" v-model="authForm.email" placeholder="deine@email.ch" @keyup.enter="submitAuth" />
+          <input class="form-input" type="email" v-model="authForm.email" placeholder="deine@email.ch" @keyup.enter="submitForm" />
         </div>
         <div class="form-group">
           <label class="form-label">Passwort</label>
-          <input class="form-input" type="password" v-model="authForm.password" placeholder="••••••••" @keyup.enter="submitAuth" />
+          <input class="form-input" type="password" v-model="authForm.password" placeholder="••••••••" @keyup.enter="submitForm" />
         </div>
 
         <div class="modal-footer">
           <button class="btn btn-ghost" @click="showAuthModal = false">Abbrechen</button>
-          <button class="btn btn-primary" @click="submitAuth" :disabled="authLoading">
+          <button class="btn btn-primary" @click="submitForm" :disabled="authLoading">
             {{ authLoading ? 'Lädt...' : (authMode === 'login' ? 'Anmelden' : 'Konto erstellen') }}
           </button>
         </div>
       </div>
     </div>
 
-    <!-- ── MAIN CONTENT ── -->
+    <!-- Hauptinhalt -->
     <main class="main">
 
-      <!-- ═══ HOME VIEW ═══ -->
+      <!-- Home: Community-Liste -->
       <div v-if="currentView === 'home'">
         <div class="section-header">
           <div class="section-title">Communities</div>
@@ -761,140 +741,135 @@
         </div>
       </div>
 
-      <!-- ═══ SUBREDDIT VIEW ═══ -->
-      <div v-if="currentView === 'subreddit'">
-        <div v-if="currentSubreddit">
-          <!-- Banner + Header -->
-          <div class="sub-banner"></div>
-          <div class="sub-header">
-            <div class="sub-header-icon">{{ currentSubreddit.name[0].toUpperCase() }}</div>
-            <div class="sub-header-info">
-              <div class="sub-header-title">{{ currentSubreddit.name }}</div>
-              <div class="sub-header-sub">r/{{ currentSubreddit.name }} · {{ currentSubreddit.description || '' }}</div>
-            </div>
-            <button class="btn btn-primary btn-sm" v-if="currentUser" @click="showNewThreadForm = !showNewThreadForm">
-              {{ showNewThreadForm ? '✕ Abbrechen' : '+ Neuer Thread' }}
+      <!-- Subreddit: Thread-Liste -->
+      <div v-if="currentView === 'subreddit' && currentSubreddit">
+        <!-- Banner + Header -->
+        <div class="sub-banner"></div>
+        <div class="sub-header">
+          <div class="sub-header-icon">{{ currentSubreddit.name[0].toUpperCase() }}</div>
+          <div class="sub-header-info">
+            <div class="sub-header-title">{{ currentSubreddit.name }}</div>
+            <div class="sub-header-sub">r/{{ currentSubreddit.name }} · {{ currentSubreddit.description || '' }}</div>
+          </div>
+          <button class="btn btn-primary btn-sm" v-if="currentUser" @click="showNewThreadForm = !showNewThreadForm">
+            {{ showNewThreadForm ? '✕ Abbrechen' : '+ Neuer Thread' }}
+          </button>
+        </div>
+
+        <!-- Neuer Thread Formular -->
+        <div class="create-box" v-if="showNewThreadForm">
+          <div class="create-box-title">Neuen Thread erstellen</div>
+          <div class="form-group">
+            <label class="form-label">Titel</label>
+            <input class="form-input" v-model="newThread.title" placeholder="Worüber möchtest du schreiben?" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Inhalt (optional)</label>
+            <textarea class="form-input form-textarea" v-model="newThread.content" placeholder="Beschreibe deinen Beitrag..."></textarea>
+          </div>
+          <div class="create-box-footer">
+            <button class="btn btn-ghost" @click="showNewThreadForm = false">Abbrechen</button>
+            <button class="btn btn-primary" @click="createThread" :disabled="!newThread.title.trim() || postLoading">
+              {{ postLoading ? 'Wird veröffentlicht...' : 'Veröffentlichen' }}
             </button>
           </div>
+        </div>
 
-          <!-- Neuer Thread Formular -->
-          <div class="create-box" v-if="showNewThreadForm">
-            <div class="create-box-title">Neuen Thread erstellen</div>
-            <div class="form-group">
-              <label class="form-label">Titel</label>
-              <input class="form-input" v-model="newThread.title" placeholder="Worüber möchtest du schreiben?" />
-            </div>
-            <div class="form-group">
-              <label class="form-label">Inhalt (optional)</label>
-              <textarea class="form-input form-textarea" v-model="newThread.content" placeholder="Beschreibe deinen Beitrag..."></textarea>
-            </div>
-            <div style="display:flex;justify-content:flex-end;gap:8px">
-              <button class="btn btn-ghost" @click="showNewThreadForm = false">Abbrechen</button>
-              <button class="btn btn-primary" @click="createThread" :disabled="!newThread.title.trim() || postLoading">
-                {{ postLoading ? 'Wird veröffentlicht...' : 'Veröffentlichen' }}
-              </button>
-            </div>
-          </div>
+        <!-- Thread Liste -->
+        <div class="loading-box" v-if="loading">
+          <div class="spinner"></div>
+          Lädt Threads...
+        </div>
 
-          <!-- Thread Liste -->
-          <div class="loading-box" v-if="loading">
-            <div class="spinner"></div>
-            Lädt Threads...
-          </div>
-
-          <div v-else-if="threads.length">
-            <div class="thread-card" v-for="t in threads" :key="t.id" @click="goToThread(t)">
-              <div class="thread-meta">
-                <span class="author">u/{{ t.users?.username || 'unbekannt' }}</span>
-                <span>·</span>
-                <span>{{ formatDate(t.created_at) }}</span>
-              </div>
-              <div class="thread-title">{{ t.title }}</div>
-              <div class="thread-preview" v-if="t.content">{{ t.content }}</div>
-              <div class="thread-footer">
-                <button class="thread-action">💬 Kommentare</button>
-              </div>
+        <div v-else-if="threads.length">
+          <div class="thread-card" v-for="t in threads" :key="t.id" @click="goToThread(t)">
+            <div class="thread-meta">
+              <span class="author">u/{{ t.users?.username || 'unbekannt' }}</span>
+              <span>·</span>
+              <span>{{ formatDate(t.created_at) }}</span>
+            </div>
+            <div class="thread-title">{{ t.title }}</div>
+            <div class="thread-preview" v-if="t.content">{{ t.content }}</div>
+            <div class="thread-footer">
+              <button class="thread-action">💬 Kommentare</button>
             </div>
           </div>
+        </div>
 
-          <div class="empty-box" v-else>
-            😶 Noch keine Threads in dieser Community.
-          </div>
+        <div class="empty-box" v-else>
+          😶 Noch keine Threads in dieser Community.
+        </div>
 
-          <!-- Auth Hint -->
-          <div class="auth-hint" v-if="!currentUser">
-            <a @click="openAuth('login')">Melde dich an</a>, um neue Threads zu erstellen.
-          </div>
+        <!-- Hinweis: nicht eingeloggt -->
+        <div class="auth-hint" v-if="!currentUser">
+          <a @click="openAuth('login')">Melde dich an</a>, um neue Threads zu erstellen.
         </div>
       </div>
 
-      <!-- ═══ THREAD VIEW ═══ -->
-      <div v-if="currentView === 'thread'">
-        <div v-if="currentThread">
+      <!-- Thread Detail -->
+      <div v-if="currentView === 'thread' && currentThread">
 
-          <!-- Original Post -->
-          <div class="thread-detail">
-            <div class="thread-detail-meta">
-              <span>r/{{ currentThread.subreddits?.name || (currentSubreddit && currentSubreddit.name) || '?' }}</span>
-              <span>·</span>
-              <span class="author">u/{{ currentThread.users?.username || 'unbekannt' }}</span>
-              <span>·</span>
-              <span>{{ formatDate(currentThread.created_at) }}</span>
-            </div>
-            <div class="thread-detail-title">{{ currentThread.title }}</div>
-            <div class="thread-detail-content" v-if="currentThread.content">{{ currentThread.content }}</div>
+        <!-- Original Post -->
+        <div class="thread-detail">
+          <div class="thread-detail-meta">
+            <span>r/{{ currentThread.subreddits?.name || (currentSubreddit && currentSubreddit.name) || '?' }}</span>
+            <span>·</span>
+            <span class="author">u/{{ currentThread.users?.username || 'unbekannt' }}</span>
+            <span>·</span>
+            <span>{{ formatDate(currentThread.created_at) }}</span>
           </div>
-
-          <!-- Kommentar schreiben -->
-          <div v-if="currentUser" class="comment-write">
-            <textarea v-model="newComment" placeholder="Was denkst du?" @keydown.ctrl.enter="createComment"></textarea>
-            <div class="comment-write-footer">
-              <button class="btn btn-primary btn-sm" @click="createComment" :disabled="!newComment.trim() || commentLoading">
-                {{ commentLoading ? 'Wird gepostet...' : 'Kommentieren' }}
-              </button>
-            </div>
-          </div>
-          <div class="auth-hint" v-else>
-            <a @click="openAuth('login')">Melde dich an</a>, um zu kommentieren.
-          </div>
-
-          <!-- Kommentare -->
-          <div class="loading-box" v-if="loading">
-            <div class="spinner"></div>
-            Lädt Kommentare...
-          </div>
-
-          <div v-else>
-            <div class="comment-section-title" v-if="comments.length">
-              {{ comments.length }} Kommentar{{ comments.length !== 1 ? 'e' : '' }}
-            </div>
-            <div class="comment" v-for="c in comments" :key="c.id">
-              <div class="comment-meta">
-                <span class="author">u/{{ c.users?.username || 'unbekannt' }}</span>
-                <span>·</span>
-                <span>{{ formatDate(c.created_at) }}</span>
-              </div>
-              <div class="comment-text">{{ c.content }}</div>
-            </div>
-            <div class="empty-box" v-if="!comments.length" style="padding:24px">
-              Sei der Erste, der kommentiert!
-            </div>
-          </div>
-
+          <div class="thread-detail-title">{{ currentThread.title }}</div>
+          <div class="thread-detail-content" v-if="currentThread.content">{{ currentThread.content }}</div>
         </div>
+
+        <!-- Kommentar schreiben -->
+        <div v-if="currentUser" class="comment-write">
+          <textarea v-model="newComment" placeholder="Was denkst du?" @keydown.ctrl.enter="createComment"></textarea>
+          <div class="comment-write-footer">
+            <button class="btn btn-primary btn-sm" @click="createComment" :disabled="!newComment.trim() || commentLoading">
+              {{ commentLoading ? 'Wird gepostet...' : 'Kommentieren' }}
+            </button>
+          </div>
+        </div>
+        <div class="auth-hint" v-else>
+          <a @click="openAuth('login')">Melde dich an</a>, um zu kommentieren.
+        </div>
+
+        <!-- Kommentare -->
+        <div class="loading-box" v-if="loading">
+          <div class="spinner"></div>
+          Lädt Kommentare...
+        </div>
+
+        <div v-else>
+          <div class="comment-section-title" v-if="comments.length">
+            {{ comments.length }} Kommentar{{ comments.length !== 1 ? 'e' : '' }}
+          </div>
+          <div class="comment" v-for="c in comments" :key="c.id">
+            <div class="comment-meta">
+              <span class="author">u/{{ c.users?.username || 'unbekannt' }}</span>
+              <span>·</span>
+              <span>{{ formatDate(c.created_at) }}</span>
+            </div>
+            <div class="comment-text">{{ c.content }}</div>
+          </div>
+          <div class="empty-box" v-if="!comments.length">
+            Sei der Erste, der kommentiert!
+          </div>
+        </div>
+
       </div>
 
     </main>
   </div>
 
   <script>
-    // Leer = relative URLs → funktioniert lokal (Flask) UND in Produktion
-    // Lokal (localhost, 127.0.0.1, oder direkt als file:// geöffnet) → Flask auf Port 3011
-    // Produktion (Coolify etc.) → relative URLs
-    const _h = window.location.hostname
-    const API_BASE = (_h === 'localhost' || _h === '127.0.0.1' || _h === '' || window.location.protocol === 'file:')
+    // Lokal → Flask auf Port 3011, Produktion → relative URLs
+    const hostname = window.location.hostname
+    const API_BASE = (hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '' || window.location.protocol === 'file:')
       ? 'http://localhost:3011'
       : ''
+
     const { createApp } = Vue
 
     createApp({
@@ -924,7 +899,7 @@
 
       async mounted() {
         const token = localStorage.getItem('token')
-        const user  = localStorage.getItem('user')
+        const user = localStorage.getItem('user')
         if (token && user) {
           this.token = token
           this.currentUser = JSON.parse(user)
@@ -935,7 +910,7 @@
       },
 
       methods: {
-        /* ── API HELPER ── */
+        // API Hilfsfunktion
         async api(path, options = {}) {
           const headers = { 'Content-Type': 'application/json', ...options.headers }
           if (this.token) headers['Authorization'] = `Bearer ${this.token}`
@@ -945,7 +920,7 @@
           return data
         },
 
-        /* ── DATA FETCHING ── */
+        // Daten laden
         async fetchSubreddits() {
           this.loading = true
           try {
@@ -987,7 +962,7 @@
           }
         },
 
-        /* ── NAVIGATION ── */
+        // Navigation
         goHome() {
           this.currentView = 'home'
           this.currentSubreddit = null
@@ -1018,11 +993,10 @@
           await this.fetchComments(thread.id)
         },
 
-        /* ── URL-ROUTING ── */
+        // URL-Hash Routing (für direkte Links und Browser-Zurück)
         async navigateFromHash() {
           const hash = window.location.hash
 
-          // Thread: #t/<uuid>
           const matchThread = hash.match(/^#t\/(.+)$/)
           if (matchThread) {
             const id = matchThread[1]
@@ -1031,8 +1005,8 @@
             await this.fetchThread(id)
             if (this.currentThread) {
               await this.fetchComments(id)
-              const fullSub = this.subreddits.find(s => s.id === this.currentThread.subreddit_id)
-              this.currentSubreddit = fullSub || {
+              const volleSub = this.subreddits.find(s => s.id === this.currentThread.subreddit_id)
+              this.currentSubreddit = volleSub || {
                 id: this.currentThread.subreddit_id,
                 name: this.currentThread.subreddits?.name,
               }
@@ -1044,7 +1018,6 @@
             return
           }
 
-          // Subreddit: #r/<name>
           const matchSub = hash.match(/^#r\/(.+)$/)
           if (matchSub) {
             const name = matchSub[1]
@@ -1067,14 +1040,14 @@
             return
           }
 
-          // Kein oder unbekannter Hash → Home
+          // Kein Hash → Home
           this.currentView = 'home'
           this.currentSubreddit = null
           this.currentThread = null
           this.showNewThreadForm = false
         },
 
-        /* ── AUTH ── */
+        // Auth
         openAuth(mode) {
           this.authMode = mode
           this.authError = ''
@@ -1082,31 +1055,20 @@
           this.showAuthModal = true
         },
 
-        async submitAuth() {
+        // Dispatcher: ruft je nach Modus login() oder register() auf
+        submitForm() {
+          if (this.authMode === 'login') this.login()
+          else this.register()
+        },
+
+        async login() {
           this.authError = ''
+          if (!this.authForm.email || !this.authForm.password) {
+            this.authError = 'E-Mail und Passwort erforderlich.'
+            return
+          }
           this.authLoading = true
           try {
-            if (this.authMode === 'register') {
-              if (!this.authForm.username || !this.authForm.email || !this.authForm.password) {
-                this.authError = 'Bitte alle Felder ausfüllen.'
-                return
-              }
-              await this.api('/users/register', {
-                method: 'POST',
-                body: JSON.stringify({
-                  username: this.authForm.username,
-                  email:    this.authForm.email,
-                  password: this.authForm.password,
-                })
-              })
-              // Nach Register direkt einloggen
-              this.authMode = 'login'
-            }
-            // Login
-            if (!this.authForm.email || !this.authForm.password) {
-              this.authError = 'E-Mail und Passwort erforderlich.'
-              return
-            }
             const result = await this.api('/auth/login', {
               method: 'POST',
               body: JSON.stringify({ email: this.authForm.email, password: this.authForm.password })
@@ -1123,6 +1085,31 @@
           }
         },
 
+        async register() {
+          this.authError = ''
+          if (!this.authForm.username || !this.authForm.email || !this.authForm.password) {
+            this.authError = 'Bitte alle Felder ausfüllen.'
+            return
+          }
+          this.authLoading = true
+          try {
+            await this.api('/users/register', {
+              method: 'POST',
+              body: JSON.stringify({
+                username: this.authForm.username,
+                email: this.authForm.email,
+                password: this.authForm.password,
+              })
+            })
+            // Nach Registrierung direkt einloggen
+            await this.login()
+          } catch (e) {
+            this.authError = e.message
+          } finally {
+            this.authLoading = false
+          }
+        },
+
         logout() {
           this.token = null
           this.currentUser = null
@@ -1130,7 +1117,7 @@
           localStorage.removeItem('user')
         },
 
-        /* ── ACTIONS ── */
+        // Thread & Kommentar erstellen
         async createThread() {
           if (!this.newThread.title.trim()) return
           this.postLoading = true
@@ -1138,8 +1125,8 @@
             const created = await this.api('/threads', {
               method: 'POST',
               body: JSON.stringify({
-                title:        this.newThread.title.trim(),
-                content:      this.newThread.content.trim(),
+                title: this.newThread.title.trim(),
+                content: this.newThread.content.trim(),
                 subreddit_id: this.currentSubreddit.id,
               })
             })
@@ -1170,16 +1157,16 @@
           }
         },
 
-        /* ── UTILS ── */
+        // Zeitangabe formatieren
         formatDate(iso) {
           if (!iso) return ''
-          const d = new Date(iso)
-          const now = new Date()
-          const diff = Math.floor((now - d) / 1000)
-          if (diff < 60)   return 'gerade eben'
-          if (diff < 3600) return `vor ${Math.floor(diff/60)} Min.`
-          if (diff < 86400) return `vor ${Math.floor(diff/3600)} Std.`
-          return d.toLocaleDateString('de-CH', { day: 'numeric', month: 'long', year: 'numeric' })
+          const erstellt = new Date(iso)
+          const jetzt = new Date()
+          const sekundenVorbei = Math.floor((jetzt - erstellt) / 1000)
+          if (sekundenVorbei < 60) return 'gerade eben'
+          if (sekundenVorbei < 3600) return `vor ${Math.floor(sekundenVorbei / 60)} Min.`
+          if (sekundenVorbei < 86400) return `vor ${Math.floor(sekundenVorbei / 3600)} Std.`
+          return erstellt.toLocaleDateString('de-CH', { day: 'numeric', month: 'long', year: 'numeric' })
         },
       }
     }).mount('#app')
