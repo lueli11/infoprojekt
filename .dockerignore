@@ -1,0 +1,13 @@
+.env
+.git
+.gitignore
+*.md
+__pycache__
+*.pyc
+*.pyo
+.claude
+ideen/
+seed_data.py
+seed_threads.py
+setup_db.py
+mainOld.html
