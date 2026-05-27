@@ -316,8 +316,8 @@
 
     /* ── SUBREDDIT CARDS (Home View) ────────────────────────────── */
     .subreddit-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      display: flex;
+      flex-direction: column;
       gap: 16px;
     }
 
@@ -624,23 +624,6 @@
       line-height: 1.6;
     }
 
-    /* ── BACK BUTTON ────────────────────────────────────────────── */
-    .back-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 13px;
-      color: #7a8899;
-      background: none;
-      border: none;
-      cursor: pointer;
-      padding: 6px 0;
-      margin-bottom: 16px;
-      transition: color .15s;
-    }
-
-    .back-btn:hover { color: #f0a030; }
-
     /* ── AUTH REQUIRED HINT ─────────────────────────────────────── */
     .auth-hint {
       background: #252d3a;
@@ -662,8 +645,7 @@
     @media (max-width: 600px) {
       .navbar { padding: 0 14px; gap: 8px; }
       .nav-brand { display: none; }
-      .subreddit-grid { grid-template-columns: 1fr; }
-      .main { padding: 20px 12px; }
+.main { padding: 20px 12px; }
       .thread-detail { padding: 18px; }
       .thread-detail-title { font-size: 18px; }
     }
@@ -908,7 +890,7 @@
 
   <script>
     // Leer = relative URLs → funktioniert lokal (Flask) UND in Produktion
-    const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:8080' : ''
+    const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:3011' : ''
     const { createApp } = Vue
 
     createApp({
