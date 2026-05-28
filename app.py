@@ -23,11 +23,15 @@ supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 @app.route("/")
 def index():
-    return send_from_directory(".", "main.html")
+    return send_from_directory(".", "index.html")
 
-@app.route("/vereinfachtindex.html")
-def vereinfacht():
-    return send_from_directory(".", "vereinfachtindex.html")
+@app.route("/r/<path:path>")
+def serve_r(path):
+    return send_from_directory(".", "index.html")
+
+@app.route("/main/main.html")
+def main_legacy():
+    return send_from_directory("main", "main.html")
 
 
 # ── AUTH ────────────────────────────────────────────────────────────────────
