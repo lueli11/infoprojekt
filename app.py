@@ -114,6 +114,13 @@ def create_subreddit():
     return jsonify(result.data[0]), 201
 
 
+@app.route("/subreddits/<subreddit_id>", methods=["DELETE"])
+@jwt_required()
+def delete_subreddit(subreddit_id):
+    supabase.table("subreddits").delete().eq("id", subreddit_id).execute()
+    return jsonify({"ok": True})
+
+
 @app.route("/subreddits/<subreddit_id>", methods=["GET"])
 def get_subreddit(subreddit_id):
     result = supabase.table("subreddits").select("*").eq("id", subreddit_id).execute()
@@ -170,6 +177,13 @@ def create_thread():
     return jsonify(result.data[0]), 201
 
 
+@app.route("/threads/<thread_id>", methods=["DELETE"])
+@jwt_required()
+def delete_thread(thread_id):
+    supabase.table("threads").delete().eq("id", thread_id).execute()
+    return jsonify({"ok": True})
+
+
 @app.route("/threads/<thread_id>", methods=["GET"])
 def get_thread(thread_id):
     result = (
@@ -195,6 +209,13 @@ def get_comments(thread_id):
         .execute()
     )
     return jsonify(result.data)
+
+
+@app.route("/comments/<comment_id>", methods=["DELETE"])
+@jwt_required()
+def delete_comment(comment_id):
+    supabase.table("comments").delete().eq("id", comment_id).execute()
+    return jsonify({"ok": True})
 
 
 @app.route("/threads/<thread_id>/comments", methods=["POST"])
