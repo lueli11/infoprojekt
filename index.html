@@ -755,9 +755,13 @@
       // AI-Generated
       computed: {
         sortedComments() {
+          const ROOT = '__root__'
+          const ids = new Set(this.comments.map(c => String(c.id)))
           const byParent = {}
           for (const c of this.comments) {
-            const key = c.reply_id ?? null
+            // Top-Level wenn kein reply_id ODER Eltern-Kommentar nicht (mehr) vorhanden (verwaist)
+            const hasParent = c.reply_id != null && ids.has(String(c.reply_id))
+            const key = hasParent ? String(c.reply_id) : ROOT
             if (!byParent[key]) byParent[key] = []
             byParent[key].push(c)
           }
@@ -766,11 +770,11 @@
             const result = []
             for (const c of children) {
               result.push({ ...c, _depth: depth })
-              result.push(...flatten(c.id, depth + 1))
+              result.push(...flatten(String(c.id), depth + 1))
             }
             return result
           }
-          return flatten(null, 0)
+          return flatten(ROOT, 0)
         }
       },
 
