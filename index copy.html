@@ -47,6 +47,35 @@
       white-space: nowrap;
     }
 
+    .breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+      color: #7a8899;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    .breadcrumb span { white-space: nowrap; }
+
+    .breadcrumb .crumb {
+      cursor: pointer;
+      color: #a0b0c0;
+      transition: color .15s;
+    }
+
+    .breadcrumb .crumb:hover { color: #f0a030; }
+    .breadcrumb .sep { color: #3a4555; font-size: 16px; }
+
+    .breadcrumb .current {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 180px;
+    }
+
     .nav-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 
     .user-chip {
@@ -71,6 +100,7 @@
       border-radius: 999px;
       padding: 10px 6px;
       cursor: pointer;
+      transition: opacity .15s;
     }
 
     .auth-btn:hover { opacity: .88; }
@@ -98,6 +128,7 @@
       font-weight: 600;
       cursor: pointer;
       border: none;
+      transition: opacity .15s;
     }
 
     .btn:hover { opacity: .88; }
@@ -172,6 +203,7 @@
       font-size: 14px;
       font-weight: 600;
       cursor: pointer;
+      transition: background .15s, color .15s;
       background: transparent;
       color: #7a8899;
     }
@@ -200,6 +232,7 @@
       font-size: 14px;
       color: #d0d8e4;
       outline: none;
+      transition: border-color .15s;
     }
 
     .form-input:focus { border-color: #f0a030; }
@@ -238,13 +271,25 @@
       margin-bottom: 20px;
     }
 
-    /* Leer */
-    .empty-box {
+    /* Loading & Leer */
+    .loading-box, .empty-box {
       text-align: center;
       padding: 60px 20px;
       color: #4a5568;
       font-size: 15px;
     }
+
+    .spinner {
+      width: 36px;
+      height: 36px;
+      border: 3px solid #3a4555;
+      border-top-color: #f0a030;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      margin: 0 auto 16px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
 
     /* Community-Karten */
     .subreddit-grid {
@@ -259,6 +304,7 @@
       border-radius: 12px;
       padding: 18px;
       cursor: pointer;
+      transition: border-color .15s;
     }
 
     .sub-card:hover { border-color: #f0a030; }
@@ -315,6 +361,22 @@
       margin-bottom: 20px;
     }
 
+    .sub-header-icon {
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      background: #f0a030;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      font-weight: 800;
+      color: #fff;
+      border: 3px solid #252d3a;
+      margin-top: -26px;
+      flex-shrink: 0;
+    }
+
     .sub-header-info { flex: 1; min-width: 0; }
 
     .sub-header-title {
@@ -337,6 +399,7 @@
       padding: 18px;
       margin-bottom: 10px;
       cursor: pointer;
+      transition: border-color .15s;
     }
 
     .thread-card:hover { border-color: #f0a030; }
@@ -449,6 +512,7 @@
       min-height: 80px;
       resize: vertical;
       outline: none;
+      transition: border-color .15s;
     }
 
     .comment-write textarea:focus { border-color: #f0a030; }
@@ -530,6 +594,14 @@
         <span class="nav-brand">Temu Reddit</span>
       </div>
 
+      <div class="breadcrumb" v-if="currentView !== 'home'">
+        <span class="crumb" @click="goHome">Home</span>
+        <span class="sep" v-if="currentSubreddit">›</span>
+        <span class="crumb" v-if="currentSubreddit" @click="goToSubreddit(currentSubreddit)">r/{{ currentSubreddit.name }}</span>
+        <span class="sep" v-if="currentView === 'thread'">›</span>
+        <span class="current" v-if="currentView === 'thread'">{{ currentThread && currentThread.title }}</span>
+      </div>
+
       <div class="nav-right">
         <template v-if="currentUser">
           <div class="user-chip">{{ currentUser.username }}</div>
@@ -559,20 +631,20 @@
 
         <div class="form-group" v-if="authMode === 'register'">
           <label class="form-label">Benutzername</label>
-          <input class="form-input" v-model="authForm.username" placeholder="z.B. jonas_dev" @keyup.enter="authMode === 'login' ? login() : register()" />
+          <input class="form-input" v-model="authForm.username" placeholder="z.B. jonas_dev" @keyup.enter="submitForm" />
         </div>
         <div class="form-group">
           <label class="form-label">E-Mail</label>
-          <input class="form-input" type="email" v-model="authForm.email" placeholder="deine@email.ch" @keyup.enter="authMode === 'login' ? login() : register()" />
+          <input class="form-input" type="email" v-model="authForm.email" placeholder="deine@email.ch" @keyup.enter="submitForm" />
         </div>
         <div class="form-group">
           <label class="form-label">Passwort</label>
-          <input class="form-input" type="password" v-model="authForm.password" placeholder="••••••••" @keyup.enter="authMode === 'login' ? login() : register()" />
+          <input class="form-input" type="password" v-model="authForm.password" placeholder="••••••••" @keyup.enter="submitForm" />
         </div>
 
         <div class="modal-footer">
           <button class="btn btn-ghost" @click="showAuthModal = false">Abbrechen</button>
-          <button class="btn btn-primary" @click="authMode === 'login' ? login() : register()" :disabled="authLoading">
+          <button class="btn btn-primary" @click="submitForm" :disabled="authLoading">
             {{ authLoading ? 'Lädt...' : (authMode === 'login' ? 'Anmelden' : 'Konto erstellen') }}
           </button>
         </div>
@@ -585,7 +657,12 @@
       <div v-if="currentView === 'home'">
         <div class="section-title">Communities</div>
 
-        <div class="subreddit-grid" v-if="subreddits.length">
+        <div class="loading-box" v-if="loading">
+          <div class="spinner"></div>
+          Lädt...
+        </div>
+
+        <div class="subreddit-grid" v-else-if="subreddits.length">
           <div class="sub-card" v-for="sub in subreddits" :key="sub.id" @click="goToSubreddit(sub)">
             <div class="sub-card-head">
               <div class="sub-icon">{{ sub.name[0].toUpperCase() }}</div>
@@ -602,6 +679,7 @@
       <div v-if="currentView === 'subreddit' && currentSubreddit">
         <div class="sub-banner"></div>
         <div class="sub-header">
+          <div class="sub-header-icon">{{ currentSubreddit.name[0].toUpperCase() }}</div>
           <div class="sub-header-info">
             <div class="sub-header-title">{{ currentSubreddit.name }}</div>
             <div class="sub-header-sub">{{ currentSubreddit.description || '' }}</div>
@@ -623,13 +701,18 @@
           </div>
           <div class="create-box-footer">
             <button class="btn btn-ghost" @click="showNewThreadForm = false">Abbrechen</button>
-            <button class="btn btn-primary" @click="createThread" :disabled="!newThread.title.trim() || submitting">
-              {{ submitting ? 'Wird veröffentlicht...' : 'Veröffentlichen' }}
+            <button class="btn btn-primary" @click="createThread" :disabled="!newThread.title.trim() || postLoading">
+              {{ postLoading ? 'Wird veröffentlicht...' : 'Veröffentlichen' }}
             </button>
           </div>
         </div>
 
-        <div v-if="threads.length">
+        <div class="loading-box" v-if="loading">
+          <div class="spinner"></div>
+          Lädt Threads...
+        </div>
+
+        <div v-else-if="threads.length">
           <div class="thread-card" v-for="t in threads" :key="t.id" @click="goToThread(t)">
             <div class="thread-meta">
               <span class="author">u/{{ t.users?.username || 'unbekannt' }}</span>
@@ -637,7 +720,7 @@
               <span>{{ formatDate(t.created_at) }}</span>
             </div>
             <div class="thread-title">{{ t.title }}</div>
-            <div class="thread-preview">{{ t.content }}</div>
+            <div class="thread-preview" v-if="t.content">{{ t.content }}</div>
           </div>
         </div>
 
@@ -666,8 +749,8 @@
         <div v-if="currentUser" class="comment-write">
           <textarea v-model="newComment" placeholder="Was denkst du?" @keydown.ctrl.enter="createComment"></textarea>
           <div class="comment-write-footer">
-            <button class="btn btn-primary btn-sm" @click="createComment" :disabled="!newComment.trim() || submitting">
-              {{ submitting ? 'Wird gepostet...' : 'Kommentieren' }}
+            <button class="btn btn-primary btn-sm" @click="createComment" :disabled="!newComment.trim() || commentLoading">
+              {{ commentLoading ? 'Wird gepostet...' : 'Kommentieren' }}
             </button>
           </div>
         </div>
@@ -675,7 +758,12 @@
           <a @click="openAuth('login')">Melde dich an</a>, um zu kommentieren.
         </div>
 
-        <div>
+        <div class="loading-box" v-if="loading">
+          <div class="spinner"></div>
+          Lädt Kommentare...
+        </div>
+
+        <div v-else>
           <div class="comment-count" v-if="comments.length">
             {{ comments.length }} Kommentar{{ comments.length !== 1 ? 'e' : '' }}
           </div>
@@ -696,8 +784,10 @@
   </div>
 
   <script>
-    const API_BASE = (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
-      ? 'http://localhost:3011' : ''
+    const hostname = window.location.hostname
+    const API_BASE = (hostname === 'localhost' || hostname === '127.0.0.1')
+      ? 'http://localhost:3011'
+      : ''
 
     const { createApp } = Vue
 
@@ -720,7 +810,9 @@
           showNewThreadForm: false,
           newThread: { title: '', content: '' },
           newComment: '',
-          submitting: false,
+          loading: false,
+          postLoading: false,
+          commentLoading: false,
         }
       },
 
@@ -738,7 +830,7 @@
 
       methods: {
         async api(path, options = {}) {
-          const headers = { 'Content-Type': 'application/json' }
+          const headers = { 'Content-Type': 'application/json', ...options.headers }
           if (this.token) headers['Authorization'] = `Bearer ${this.token}`
           const res = await fetch(API_BASE + path, { ...options, headers })
           const data = await res.json().catch(() => ({}))
@@ -747,18 +839,24 @@
         },
 
         async fetchSubreddits() {
+          this.loading = true
           try { this.subreddits = await this.api('/subreddits') }
           catch (e) { console.error(e) }
+          finally { this.loading = false }
         },
 
         async fetchThreads(subredditId) {
+          this.loading = true
           try { this.threads = await this.api(`/subreddits/${subredditId}/threads`) }
           catch (e) { console.error(e) }
+          finally { this.loading = false }
         },
 
         async fetchThread(threadId) {
+          this.loading = true
           try { this.currentThread = await this.api(`/threads/${threadId}`) }
           catch (e) { console.error(e) }
+          finally { this.loading = false }
         },
 
         async fetchComments(threadId) {
@@ -771,13 +869,15 @@
           this.currentSubreddit = null
           this.currentThread = null
           this.showNewThreadForm = false
-          if (location.pathname !== '/') history.pushState(null, '', '/')
+          if (!this.subreddits.length) this.fetchSubreddits()
+          if (window.location.pathname !== '/') history.pushState(null, '', '/')
         },
 
         async goToSubreddit(sub) {
           this.currentSubreddit = sub
           this.currentThread = null
           this.showNewThreadForm = false
+          this.newThread = { title: '', content: '' }
           this.currentView = 'subreddit'
           history.pushState(null, '', `/r/${sub.name}`)
           await this.fetchThreads(sub.id)
@@ -793,18 +893,19 @@
         },
 
         async navigateFromPath() {
-          const path = location.pathname
+          const path = window.location.pathname
 
           const matchThread = path.match(/^\/r\/([^/]+)\/(.+)$/)
           if (matchThread) {
-            const [, subName, threadId] = matchThread
+            const subName = matchThread[1]
+            const threadId = matchThread[2]
             this.newComment = ''
             this.comments = []
             await this.fetchThread(threadId)
             if (this.currentThread) {
               await this.fetchComments(threadId)
-              this.currentSubreddit = this.subreddits.find(s => s.id === this.currentThread.subreddit_id)
-                || { id: this.currentThread.subreddit_id, name: subName }
+              const volleSub = this.subreddits.find(s => s.id === this.currentThread.subreddit_id)
+              this.currentSubreddit = volleSub || { id: this.currentThread.subreddit_id, name: subName }
               this.currentView = 'thread'
             } else {
               history.replaceState(null, '', '/')
@@ -815,11 +916,17 @@
 
           const matchSub = path.match(/^\/r\/([^/]+)$/)
           if (matchSub) {
-            const sub = this.subreddits.find(s => s.name === matchSub[1])
+            const name = matchSub[1]
+            let sub = this.subreddits.find(s => s.name === name)
+            if (!sub) {
+              await this.fetchSubreddits()
+              sub = this.subreddits.find(s => s.name === name)
+            }
             if (sub) {
               this.currentSubreddit = sub
               this.currentThread = null
               this.showNewThreadForm = false
+              this.newThread = { title: '', content: '' }
               this.currentView = 'subreddit'
               await this.fetchThreads(sub.id)
             } else {
@@ -840,6 +947,11 @@
           this.authError = ''
           this.authForm = { username: '', email: '', password: '' }
           this.showAuthModal = true
+        },
+
+        submitForm() {
+          if (this.authMode === 'login') this.login()
+          else this.register()
         },
 
         async login() {
@@ -898,8 +1010,8 @@
         },
 
         async createThread() {
-          if (!this.newThread.title.trim() || this.submitting) return
-          this.submitting = true
+          if (!this.newThread.title.trim()) return
+          this.postLoading = true
           try {
             const created = await this.api('/threads', {
               method: 'POST',
@@ -915,13 +1027,13 @@
           } catch (e) {
             alert('Fehler: ' + e.message)
           } finally {
-            this.submitting = false
+            this.postLoading = false
           }
         },
 
         async createComment() {
-          if (!this.newComment.trim() || this.submitting) return
-          this.submitting = true
+          if (!this.newComment.trim()) return
+          this.commentLoading = true
           try {
             const created = await this.api(`/threads/${this.currentThread.id}/comments`, {
               method: 'POST',
@@ -932,7 +1044,7 @@
           } catch (e) {
             alert('Fehler: ' + e.message)
           } finally {
-            this.submitting = false
+            this.commentLoading = false
           }
         },
 
