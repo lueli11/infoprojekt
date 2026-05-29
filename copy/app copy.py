@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from supabase import create_client
-from werkzeug.security import generate_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 from dotenv import load_dotenv
 import os
 
@@ -29,6 +29,11 @@ def index():
 def serve_r(path):
     return send_from_directory(".", "index.html")
 
+@app.route("/main/main.html")
+def main_legacy():
+    return send_from_directory("main", "main.html")
+
+
 # ── AUTH ────────────────────────────────────────────────────────────────────
 
 @app.route("/users/register", methods=["POST"])
@@ -37,6 +42,9 @@ def register():
     username = daten.get("username")
     email    = daten.get("email")
     password = daten.get("password")
+
+    if not username or not email or not password:
+        return jsonify({"fehler": "username, email und password sind Pflicht"}), 400
 
     passwort_hash = generate_password_hash(password)
 
@@ -57,10 +65,25 @@ def login():
     password = daten.get("password")
 
     result = supabase.table("users").select("*").eq("email", email).execute()
+    if not result.data:
+        return jsonify({"fehler": "Ungültige Anmeldedaten"}), 401
+
     user = result.data[0]
+    if not check_password_hash(user["password_hash"], password):
+        return jsonify({"fehler": "Ungültige Anmeldedaten"}), 401
 
     token = create_access_token(identity=user["id"])
     return jsonify({"token": token, "user_id": user["id"], "username": user["username"]})
+
+
+# ── USERS ────────────────────────────────────────────────────────────────────
+
+@app.route("/users/<user_id>", methods=["GET"])
+def get_user(user_id):
+    result = supabase.table("users").select("id, username, description, pfp").eq("id", user_id).execute()
+    if not result.data:
+        return jsonify({"fehler": "Benutzer nicht gefunden"}), 404
+    return jsonify(result.data[0])
 
 
 # ── SUBREDDITS ───────────────────────────────────────────────────────────────
@@ -79,6 +102,9 @@ def create_subreddit():
     name        = daten.get("name")
     description = daten.get("description", "")
 
+    if not name:
+        return jsonify({"fehler": "name ist Pflicht"}), 400
+
     result = supabase.table("subreddits").insert({
         "name": name,
         "description": description,
@@ -95,6 +121,14 @@ def delete_subreddit(subreddit_id):
     return jsonify({"ok": True})
 
 
+@app.route("/subreddits/<subreddit_id>", methods=["GET"])
+def get_subreddit(subreddit_id):
+    result = supabase.table("subreddits").select("*").eq("id", subreddit_id).execute()
+    if not result.data:
+        return jsonify({"fehler": "Subreddit nicht gefunden"}), 404
+    return jsonify(result.data[0])
+
+
 @app.route("/subreddits/<subreddit_id>/threads", methods=["GET"])
 def get_threads_by_subreddit(subreddit_id):
     result = (
@@ -109,6 +143,18 @@ def get_threads_by_subreddit(subreddit_id):
 
 # ── THREADS ──────────────────────────────────────────────────────────────────
 
+@app.route("/threads", methods=["GET"])
+def get_threads():
+    result = (
+        supabase.table("threads")
+        .select("*, users(username), subreddits(name)")
+        .order("created_at", desc=True)
+        .limit(50)
+        .execute()
+    )
+    return jsonify(result.data)
+
+
 @app.route("/threads", methods=["POST"])
 @jwt_required()
 def create_thread():
@@ -117,6 +163,9 @@ def create_thread():
     title        = daten.get("title")
     content      = daten.get("content", "")
     subreddit_id = daten.get("subreddit_id")
+
+    if not title or not subreddit_id:
+        return jsonify({"fehler": "title und subreddit_id sind Pflicht"}), 400
 
     result = supabase.table("threads").insert({
         "title": title,
@@ -143,6 +192,8 @@ def get_thread(thread_id):
         .eq("id", thread_id)
         .execute()
     )
+    if not result.data:
+        return jsonify({"fehler": "Thread nicht gefunden"}), 404
     return jsonify(result.data[0])
 
 
@@ -174,11 +225,13 @@ def create_comment(thread_id):
     daten = request.get_json()
     content = daten.get("content")
 
+    if not content:
+        return jsonify({"fehler": "content ist Pflicht"}), 400
+
     result = supabase.table("comments").insert({
         "content": content,
         "user_id": user_id,
         "thread_id": thread_id,
-        "reply_id": daten.get("reply_id"),
     }).execute()
 
     return jsonify(result.data[0]), 201

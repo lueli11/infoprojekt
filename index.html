@@ -520,6 +520,7 @@
       .thread-detail { padding: 16px; }
       .thread-detail-title { font-size: 18px; }
     }
+
   </style>
 </head>
 <body>
@@ -673,6 +674,7 @@
           <div class="thread-detail-content" v-if="currentThread.content">{{ currentThread.content }}</div>
         </div>
 
+        <!-- AI-Generated Reply UI -->
         <div v-if="currentUser" class="comment-write">
           <textarea v-model="newComment" placeholder="Was denkst du?"></textarea>
           <div class="comment-write-footer">
@@ -686,14 +688,23 @@
         <div class="comment-count" v-if="comments.length">
           {{ comments.length }} Kommentar{{ comments.length !== 1 ? 'e' : '' }}
         </div>
-        <div class="comment" v-for="c in comments" :key="c.id">
+        <div class="comment" v-for="c in sortedComments" :key="c.id" :style="{ marginLeft: (c._depth * 24) + 'px' }">
           <div class="comment-meta">
             <span class="author">u/{{ c.users?.username || 'unbekannt' }}</span>
             <span>·</span>
             <span>{{ formatDate(c.created_at) }}</span>
-            <button class="btn btn-danger btn-sm" style="margin-left:auto" v-if="currentUser" @click="deleteComment(c.id)">Löschen</button>
+            <button class="btn btn-ghost btn-sm" style="margin-left:auto" v-if="currentUser" @click="replyingTo = (replyingTo?.id === c.id ? null : c); newComment = ''">Antworten</button>
+            <button class="btn btn-danger btn-sm" v-if="currentUser" @click="deleteComment(c.id)">Löschen</button>
           </div>
           <div class="comment-text">{{ c.content }}</div>
+          <!-- AI-Generated inline reply form -->
+          <div v-if="currentUser && replyingTo?.id === c.id" class="comment-write" style="margin-top:8px;">
+            <textarea v-model="newComment" placeholder="Deine Antwort..."></textarea>
+            <div class="comment-write-footer">
+              <button class="btn btn-sm" @click="replyingTo = null; newComment = ''">Abbrechen</button>
+              <button class="btn btn-primary btn-sm" @click="createComment" :disabled="!newComment.trim()">Antworten</button>
+            </div>
+          </div>
         </div>
 
       </div>
@@ -726,6 +737,7 @@
           newThread: { title: '', content: '' },
           newComment: '',
           newSubredditName: '',
+          replyingTo: null,
         }
       },
 
@@ -740,34 +752,58 @@
         await this.navigateFromPath()
       },
 
+      // AI-Generated
+      computed: {
+        sortedComments() {
+          const byParent = {}
+          for (const c of this.comments) {
+            const key = c.reply_id ?? null
+            if (!byParent[key]) byParent[key] = []
+            byParent[key].push(c)
+          }
+          function flatten(parentId, depth) {
+            const children = (byParent[parentId] || []).sort((a, b) => new Date(a.created_at) - new Date(b.created_at))
+            const result = []
+            for (const c of children) {
+              result.push({ ...c, _depth: depth })
+              result.push(...flatten(c.id, depth + 1))
+            }
+            return result
+          }
+          return flatten(null, 0)
+        }
+      },
+
       methods: {
         async fetchSubreddits() {
           try {
             const response = await fetch(API_BASE + '/subreddits')
             this.subreddits = await response.json()
-          } catch (e) { console.error(e) }
+          } catch {}
         },
 
         async fetchThreads(subredditId) {
           try {
             const response = await fetch(API_BASE + `/subreddits/${subredditId}/threads`)
             this.threads = await response.json()
-          } catch (e) { console.error(e) }
+          } catch {}
         },
 
         async fetchThread(threadId) {
           try {
             const response = await fetch(API_BASE + `/threads/${threadId}`)
             this.currentThread = await response.json()
-          } catch (e) { console.error(e) }
+          } catch {}
         },
 
         async fetchComments(threadId) {
           try {
             const response = await fetch(API_BASE + `/threads/${threadId}/comments`)
             this.comments = await response.json()
-          } catch (e) { console.error(e) }
+          } catch {}
         },
+
+        // AI-Generated
 
         async navigateFromPath() {
           const parts = location.pathname.split('/').filter(Boolean).map(decodeURIComponent)
@@ -809,6 +845,8 @@
             }
           }
         },
+
+        // AI-Generated Auth
 
         openAuth(mode) {
           this.authMode = mode
@@ -921,7 +959,7 @@
               body: JSON.stringify({ name: this.newSubredditName.trim() })
             })
             location.reload()
-          } catch (e) { console.error(e) }
+          } catch {}
         },
 
         async createThread() {
@@ -950,12 +988,14 @@
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${this.token}`
               },
-              body: JSON.stringify({ content: this.newComment.trim() })
+              body: JSON.stringify({ content: this.newComment.trim(), reply_id: this.replyingTo?.id ?? null })
             })
+            this.replyingTo = null
             location.reload()
           } catch {}
         },
 
+        // AI-Generated
         formatDate(iso) {
           if (!iso) return ''
           const d = new Date(iso)
