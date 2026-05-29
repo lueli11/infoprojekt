@@ -695,7 +695,6 @@
           </div>
           <div class="comment-text">{{ c.content }}</div>
         </div>
-        <div class="empty-box" v-if="!comments.length">Sei der Erste, der kommentiert!</div>
 
       </div>
 
@@ -742,38 +741,36 @@
       },
 
       methods: {
-        async api(path, options = {}) {
-          const headers = { 'Content-Type': 'application/json' }
-          if (this.token) headers['Authorization'] = `Bearer ${this.token}`
-          const res = await fetch(API_BASE + path, { ...options, headers })
-          const data = await res.json().catch(() => ({}))
-          if (!res.ok) throw new Error(data.fehler || `Fehler ${res.status}`)
-          return data
-        },
-
         async fetchSubreddits() {
-          try { this.subreddits = await this.api('/subreddits') }
-          catch (e) { console.error(e) }
+          try {
+            const response = await fetch(API_BASE + '/subreddits')
+            this.subreddits = await response.json()
+          } catch (e) { console.error(e) }
         },
 
         async fetchThreads(subredditId) {
-          try { this.threads = await this.api(`/subreddits/${subredditId}/threads`) }
-          catch (e) { console.error(e) }
+          try {
+            const response = await fetch(API_BASE + `/subreddits/${subredditId}/threads`)
+            this.threads = await response.json()
+          } catch (e) { console.error(e) }
         },
 
         async fetchThread(threadId) {
-          try { this.currentThread = await this.api(`/threads/${threadId}`) }
-          catch (e) { console.error(e) }
+          try {
+            const response = await fetch(API_BASE + `/threads/${threadId}`)
+            this.currentThread = await response.json()
+          } catch (e) { console.error(e) }
         },
 
         async fetchComments(threadId) {
-          try { this.comments = await this.api(`/threads/${threadId}/comments`) }
-          catch (e) { console.error(e) }
+          try {
+            const response = await fetch(API_BASE + `/threads/${threadId}/comments`)
+            this.comments = await response.json()
+          } catch (e) { console.error(e) }
         },
 
         async navigateFromPath() {
-          const parts = location.pathname.split('/').filter(Boolean)
-          // parts[0] === 'r', parts[1] === subName, parts[2] === threadId
+          const parts = location.pathname.split('/').filter(Boolean).map(decodeURIComponent)
 
           if (parts[0] !== 'r') {
             this.currentView = 'home'
@@ -783,7 +780,6 @@
             return
           }
 
-          // Set view immediately before any await to avoid flash of home
           this.currentView = parts[2] ? 'thread' : 'subreddit'
 
           if (parts[2]) {
@@ -828,10 +824,13 @@
             return
           }
           try {
-            const result = await this.api('/auth/login', {
+            const response = await fetch(API_BASE + '/auth/login', {
               method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ email: this.authForm.email, password: this.authForm.password })
             })
+            const result = await response.json()
+            if (!response.ok) { this.authError = result.fehler || 'Fehler beim Login.'; return }
             this.token = result.token
             this.currentUser = { id: result.user_id, username: result.username }
             localStorage.setItem('token', result.token)
@@ -849,14 +848,20 @@
             return
           }
           try {
-            await this.api('/users/register', {
+            const response = await fetch(API_BASE + '/users/register', {
               method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
                 username: this.authForm.username,
                 email: this.authForm.email,
                 password: this.authForm.password,
               })
             })
+            if (!response.ok) {
+              const data = await response.json()
+              this.authError = data.fehler || 'Fehler bei der Registrierung.'
+              return
+            }
             await this.login()
           } catch (e) {
             this.authError = e.message
@@ -872,14 +877,20 @@
 
         async deleteSubreddit(id) {
           try {
-            await this.api(`/subreddits/${id}`, { method: 'DELETE' })
+            await fetch(API_BASE + `/subreddits/${id}`, {
+              method: 'DELETE',
+              headers: { 'Authorization': `Bearer ${this.token}` }
+            })
             location.href = '/'
           } catch {}
         },
 
         async deleteThread(id) {
           try {
-            await this.api(`/threads/${id}`, { method: 'DELETE' })
+            await fetch(API_BASE + `/threads/${id}`, {
+              method: 'DELETE',
+              headers: { 'Authorization': `Bearer ${this.token}` }
+            })
             if (this.currentView === 'thread') {
               location.href = '/r/' + this.currentSubreddit.name
             } else {
@@ -890,7 +901,10 @@
 
         async deleteComment(id) {
           try {
-            await this.api(`/comments/${id}`, { method: 'DELETE' })
+            await fetch(API_BASE + `/comments/${id}`, {
+              method: 'DELETE',
+              headers: { 'Authorization': `Bearer ${this.token}` }
+            })
             location.reload()
           } catch {}
         },
@@ -898,8 +912,12 @@
         async createSubreddit() {
           if (!this.newSubredditName.trim()) return
           try {
-            const created = await this.api('/subreddits', {
+            await fetch(API_BASE + '/subreddits', {
               method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${this.token}`
+              },
               body: JSON.stringify({ name: this.newSubredditName.trim() })
             })
             location.reload()
@@ -908,8 +926,12 @@
 
         async createThread() {
           try {
-            const created = await this.api('/threads', {
+            await fetch(API_BASE + '/threads', {
               method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${this.token}`
+              },
               body: JSON.stringify({
                 title: this.newThread.title.trim(),
                 content: this.newThread.content.trim(),
@@ -922,8 +944,12 @@
 
         async createComment() {
           try {
-            const created = await this.api(`/threads/${this.currentThread.id}/comments`, {
+            await fetch(API_BASE + `/threads/${this.currentThread.id}/comments`, {
               method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${this.token}`
+              },
               body: JSON.stringify({ content: this.newComment.trim() })
             })
             location.reload()
