@@ -50,6 +50,7 @@
     .nav-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 
     .user-chip {
+    .user-name {
       display: flex;
       align-items: center;
       gap: 8px;
@@ -518,11 +519,13 @@
           <circle cx="32" cy="25" r="14" fill="#f0a030" />
         </svg>
         <span class="nav-brand">Temu Reddit</span>
+        <a class="nav-brand">Temu Reddit</a>
       </a>
 
       <div class="nav-right">
         <template v-if="currentUser">
           <div class="user-chip">{{ currentUser.username }}</div>
+          <div class="user-name">{{ currentUser.username }}</div>
         </template>
         <template v-else>
             <span>Register</span>
