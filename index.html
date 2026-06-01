@@ -66,7 +66,7 @@
     .auth-btn {
       display: flex;
       align-items: center;
-      background: linear-gradient(135deg, #f0a030, #e08820);
+      background: #f0a030;
       border: none;
       border-radius: 999px;
       padding: 10px 6px;
@@ -103,7 +103,7 @@
     .btn:hover { opacity: .88; }
 
     .btn-primary {
-      background: linear-gradient(135deg, #f0a030, #e08820);
+      background: #f0a030;
       color: #fff;
     }
 
@@ -130,7 +130,10 @@
     /* Modal */
     .modal-overlay {
       position: fixed;
-      inset: 0;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
       background: rgba(0,0,0,.65);
       display: flex;
       align-items: center;
@@ -177,7 +180,7 @@
     }
 
     .tab-btn.active {
-      background: linear-gradient(135deg, #f0a030, #e08820);
+      background: #f0a030;
       color: #fff;
     }
 
@@ -301,7 +304,7 @@
     /* Subreddit-Header */
     .sub-banner {
       height: 80px;
-      background: linear-gradient(135deg, #1a3a5c 0%, #f0a030 100%);
+      background: #f0a030;
       border-radius: 12px 12px 0 0;
     }
 
@@ -368,10 +371,6 @@
       font-size: 13px;
       color: #7a8899;
       line-height: 1.5;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
     }
 
     /* Neuer Thread */
