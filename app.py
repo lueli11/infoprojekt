@@ -11,7 +11,7 @@ load_dotenv()
 app = Flask(__name__)
 CORS(app)
 
-app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY", "dev-secret-bitte-aendern")
+app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY", "dev-secret")
 jwt = JWTManager(app)
 
 SUPABASE_URL = os.environ.get("SUPABASE_URL")
@@ -19,7 +19,7 @@ SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 
-# ── FRONTEND ────────────────────────────────────────────────────────────────
+# ── FRONTEND Ai gemacht dass wir Seiten reloaden konnte zum testen und zu domain wechseln konnten
 
 @app.route("/")
 def index():
@@ -29,7 +29,7 @@ def index():
 def serve_r(path):
     return send_from_directory(".", "index.html")
 
-# ── AUTH ────────────────────────────────────────────────────────────────────
+# ── AUTH eben auch von AI
 
 @app.route("/users/register", methods=["POST"])
 def register():
@@ -63,7 +63,7 @@ def login():
     return jsonify({"token": token, "user_id": user["id"], "username": user["username"]})
 
 
-# ── SUBREDDITS ───────────────────────────────────────────────────────────────
+# ── SUBREDDITS 
 
 @app.route("/subreddits", methods=["GET"])
 def get_subreddits():
@@ -85,7 +85,7 @@ def create_subreddit():
         "creator_id": user_id,
     }).execute()
 
-    return jsonify(result.data[0]), 201
+    return jsonify({"ok": True}), 201
 
 
 @app.route("/subreddits/<subreddit_id>", methods=["DELETE"])
@@ -107,7 +107,7 @@ def get_threads_by_subreddit(subreddit_id):
     return jsonify(result.data)
 
 
-# ── THREADS ──────────────────────────────────────────────────────────────────
+# ── THREADS 
 
 @app.route("/threads", methods=["POST"])
 @jwt_required()
@@ -125,7 +125,7 @@ def create_thread():
         "subreddit_id": subreddit_id,
     }).execute()
 
-    return jsonify(result.data[0]), 201
+    return jsonify({"ok": True}), 201
 
 
 @app.route("/threads/<thread_id>", methods=["DELETE"])
@@ -146,7 +146,7 @@ def get_thread(thread_id):
     return jsonify(result.data[0])
 
 
-# ── KOMMENTARE ───────────────────────────────────────────────────────────────
+# ── Comments 
 
 @app.route("/threads/<thread_id>/comments", methods=["GET"])
 def get_comments(thread_id):
@@ -181,7 +181,7 @@ def create_comment(thread_id):
         "reply_id": daten.get("reply_id"),
     }).execute()
 
-    return jsonify(result.data[0]), 201
+    return jsonify({"ok": True}), 201
 
 
 if __name__ == "__main__":
