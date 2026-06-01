@@ -63,7 +63,6 @@
     }
 
     /* Auth-Button (kombiniert) */
-    .auth-btn {
       display: flex;
       align-items: center;
       background: #f0a030;
@@ -73,9 +72,7 @@
       cursor: pointer;
     }
 
-    .auth-btn:hover { opacity: .88; }
 
-    .auth-btn span {
       color: #fff;
       font-size: 15px;
       font-weight: 600;
@@ -83,7 +80,6 @@
       white-space: nowrap;
     }
 
-    .auth-btn .divider {
       width: 1px;
       height: 18px;
       background: rgba(255,255,255,0.5);
@@ -91,7 +87,6 @@
     }
 
     /* Buttons */
-    .btn {
       padding: 8px 18px;
       border-radius: 999px;
       font-size: 14px;
@@ -100,22 +95,17 @@
       border: none;
     }
 
-    .btn:hover { opacity: .88; }
 
-    .btn-primary {
       background: #f0a030;
       color: #fff;
     }
 
-    .btn-ghost {
       background: transparent;
       border: 1px solid #3a4555;
       color: #a0b0c0;
     }
 
-    .btn-ghost:hover { border-color: #f0a030; color: #f0a030; opacity: 1; }
 
-    .btn-danger {
       background: transparent;
       border: 1px solid #c0392b;
       color: #e74c3c;
@@ -123,9 +113,7 @@
       font-size: 13px;
     }
 
-    .btn-danger:hover { background: rgba(231,76,60,.1); opacity: 1; }
 
-    .btn-sm { padding: 6px 14px; font-size: 13px; }
 
     /* Modal */
     .modal-overlay {
@@ -167,7 +155,6 @@
       padding: 4px;
     }
 
-    .tab-btn {
       flex: 1;
       padding: 8px;
       border: none;
@@ -179,7 +166,6 @@
       color: #7a8899;
     }
 
-    .tab-btn.active {
       background: #f0a030;
       color: #fff;
     }
@@ -537,10 +523,8 @@
       <div class="nav-right">
         <template v-if="currentUser">
           <div class="user-chip">{{ currentUser.username }}</div>
-          <button class="btn btn-danger" @click="logout">Abmelden</button>
         </template>
         <template v-else>
-          <button class="auth-btn" @click="openAuth('login')">
             <span>Register</span>
             <span class="divider"></span>
             <span>Login</span>
@@ -555,8 +539,6 @@
         <div class="modal-title">{{ authMode === 'login' ? 'Willkommen zurück' : 'Konto erstellen' }}</div>
 
         <div class="tab-row">
-          <button class="tab-btn" :class="{ active: authMode === 'login' }" @click="authMode = 'login'">Anmelden</button>
-          <button class="tab-btn" :class="{ active: authMode === 'register' }" @click="authMode = 'register'">Registrieren</button>
         </div>
 
         <div class="error-msg" v-if="authError">{{ authError }}</div>
@@ -575,8 +557,6 @@
         </div>
 
         <div class="modal-footer">
-          <button class="btn btn-ghost" @click="showAuthModal = false">Abbrechen</button>
-          <button class="btn btn-primary" @click="authMode === 'login' ? login() : register()">
             {{ authMode === 'login' ? 'Anmelden' : 'Konto erstellen' }}
           </button>
         </div>
@@ -591,7 +571,6 @@
 
         <div v-if="currentUser" style="display:flex; gap:8px; margin-bottom:16px;">
           <input class="form-input" v-model="newSubredditName" placeholder="Neue Community..." @keyup.enter="createSubreddit" />
-          <button class="btn btn-primary" @click="createSubreddit" :disabled="!newSubredditName.trim()">Erstellen</button>
         </div>
 
         <div class="subreddit-grid" v-if="subreddits.length">
@@ -599,7 +578,6 @@
             <div class="sub-card-head">
               <div class="sub-icon">{{ sub.name[0].toUpperCase() }}</div>
               <div class="sub-name">{{ sub.name }}</div>
-              <button class="btn btn-danger btn-sm" style="margin-left:auto" v-if="currentUser" @click.prevent.stop="deleteSubreddit(sub.id)">Löschen</button>
             </div>
             <div class="sub-desc">{{ sub.description || 'Keine Beschreibung vorhanden.' }}</div>
           </a>
@@ -616,7 +594,6 @@
             <div class="sub-header-title">{{ currentSubreddit.name }}</div>
             <div class="sub-header-sub">{{ currentSubreddit.description }}</div>
           </div>
-          <button class="btn btn-primary btn-sm" v-if="currentUser" @click="showNewThreadForm = !showNewThreadForm">
             {{ showNewThreadForm ? '✕ Abbrechen' : '+ Neuer Thread' }}
           </button>
         </div>
@@ -632,8 +609,6 @@
             <textarea class="form-input form-textarea" v-model="newThread.content" placeholder="Beschreibe deinen Beitrag..."></textarea>
           </div>
           <div class="create-box-footer">
-            <button class="btn btn-ghost" @click="showNewThreadForm = false">Abbrechen</button>
-            <button class="btn btn-primary" @click="createThread" :disabled="!newThread.title.trim()">Veröffentlichen</button>
           </div>
         </div>
 
@@ -643,7 +618,6 @@
               <span class="author">u/{{ t.users?.username || 'unbekannt' }}</span>
               <span>·</span>
               <span>{{ formatDate(t.created_at) }}</span>
-              <button class="btn btn-danger btn-sm" style="margin-left:auto" v-if="currentUser" @click.prevent.stop="deleteThread(t.id)">Löschen</button>
             </div>
             <div class="thread-title">{{ t.title }}</div>
             <div class="thread-preview">{{ t.content }}</div>
@@ -667,7 +641,6 @@
             <span class="author">u/{{ currentThread.users?.username || 'unbekannt' }}</span>
             <span>·</span>
             <span>{{ formatDate(currentThread.created_at) }}</span>
-            <button class="btn btn-danger btn-sm" style="margin-left:auto" v-if="currentUser" @click="deleteThread(currentThread.id)">Thread löschen</button>
           </div>
           <div class="thread-detail-title">{{ currentThread.title }}</div>
           <div class="thread-detail-content" v-if="currentThread.content">{{ currentThread.content }}</div>
@@ -677,7 +650,6 @@
         <div v-if="currentUser" class="comment-write">
           <textarea v-model="newComment" placeholder="Was denkst du?"></textarea>
           <div class="comment-write-footer">
-            <button class="btn btn-primary btn-sm" @click="createComment" :disabled="!newComment.trim()">Kommentieren</button>
           </div>
         </div>
         <div class="auth-hint" v-else>
@@ -692,16 +664,12 @@
             <span class="author">u/{{ c.users?.username || 'unbekannt' }}</span>
             <span>·</span>
             <span>{{ formatDate(c.created_at) }}</span>
-            <button class="btn btn-ghost btn-sm" style="margin-left:auto" v-if="currentUser" @click="replyingTo = (replyingTo?.id === c.id ? null : c); newComment = ''">Antworten</button>
-            <button class="btn btn-danger btn-sm" v-if="currentUser" @click="deleteComment(c.id)">Löschen</button>
           </div>
           <div class="comment-text">{{ c.content }}</div>
           <!-- AI-Generated inline reply form -->
           <div v-if="currentUser && replyingTo?.id === c.id" class="comment-write" style="margin-top:8px;">
             <textarea v-model="newComment" placeholder="Deine Antwort..."></textarea>
             <div class="comment-write-footer">
-              <button class="btn btn-sm" @click="replyingTo = null; newComment = ''">Abbrechen</button>
-              <button class="btn btn-primary btn-sm" @click="createComment" :disabled="!newComment.trim()">Antworten</button>
             </div>
           </div>
         </div>
