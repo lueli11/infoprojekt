@@ -779,31 +779,23 @@
 
       methods: {
         async fetchSubreddits() {
-          try {
-            const response = await fetch(API_BASE + '/subreddits')
-            this.subreddits = await response.json()
-          } catch {}
+          const response = await fetch(API_BASE + '/subreddits')
+          this.subreddits = await response.json()
         },
 
         async fetchThreads(subredditId) {
-          try {
-            const response = await fetch(API_BASE + `/subreddits/${subredditId}/threads`)
-            this.threads = await response.json()
-          } catch {}
+          const response = await fetch(API_BASE + `/subreddits/${subredditId}/threads`)
+          this.threads = await response.json()
         },
 
         async fetchThread(threadId) {
-          try {
-            const response = await fetch(API_BASE + `/threads/${threadId}`)
-            this.currentThread = await response.json()
-          } catch {}
+          const response = await fetch(API_BASE + `/threads/${threadId}`)
+          this.currentThread = await response.json()
         },
 
         async fetchComments(threadId) {
-          try {
-            const response = await fetch(API_BASE + `/threads/${threadId}/comments`)
-            this.comments = await response.json()
-          } catch {}
+          const response = await fetch(API_BASE + `/threads/${threadId}/comments`)
+          this.comments = await response.json()
         },
 
         // AI-Generated
@@ -864,22 +856,18 @@
             this.authError = 'E-Mail und Passwort erforderlich.'
             return
           }
-          try {
-            const response = await fetch(API_BASE + '/auth/login', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ email: this.authForm.email, password: this.authForm.password })
-            })
-            const result = await response.json()
-            if (!response.ok) { this.authError = result.fehler || 'Fehler beim Login.'; return }
-            this.token = result.token
-            this.currentUser = { id: result.user_id, username: result.username }
-            localStorage.setItem('token', result.token)
-            localStorage.setItem('user', JSON.stringify(this.currentUser))
-            this.showAuthModal = false
-          } catch (e) {
-            this.authError = e.message
-          }
+          const response = await fetch(API_BASE + '/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: this.authForm.email, password: this.authForm.password })
+          })
+          const result = await response.json()
+          if (!response.ok) { this.authError = result.fehler || 'Fehler beim Login.'; return }
+          this.token = result.token
+          this.currentUser = { id: result.user_id, username: result.username }
+          localStorage.setItem('token', result.token)
+          localStorage.setItem('user', JSON.stringify(this.currentUser))
+          this.showAuthModal = false
         },
 
         async register() {
@@ -888,25 +876,21 @@
             this.authError = 'Bitte alle Felder ausfüllen.'
             return
           }
-          try {
-            const response = await fetch(API_BASE + '/users/register', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                username: this.authForm.username,
-                email: this.authForm.email,
-                password: this.authForm.password,
-              })
+          const response = await fetch(API_BASE + '/users/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              username: this.authForm.username,
+              email: this.authForm.email,
+              password: this.authForm.password,
             })
-            if (!response.ok) {
-              const data = await response.json()
-              this.authError = data.fehler || 'Fehler bei der Registrierung.'
-              return
-            }
-            await this.login()
-          } catch (e) {
-            this.authError = e.message
+          })
+          if (!response.ok) {
+            const data = await response.json()
+            this.authError = data.fehler || 'Fehler bei der Registrierung.'
+            return
           }
+          await this.login()
         },
 
         logout() {
@@ -917,85 +901,73 @@
         },
 
         async deleteSubreddit(id) {
-          try {
-            await fetch(API_BASE + `/subreddits/${id}`, {
-              method: 'DELETE',
-              headers: { 'Authorization': `Bearer ${this.token}` }
-            })
-            location.href = '/'
-          } catch {}
+          await fetch(API_BASE + `/subreddits/${id}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${this.token}` }
+          })
+          location.href = '/'
         },
 
         async deleteThread(id) {
-          try {
-            await fetch(API_BASE + `/threads/${id}`, {
-              method: 'DELETE',
-              headers: { 'Authorization': `Bearer ${this.token}` }
-            })
-            if (this.currentView === 'thread') {
-              location.href = '/r/' + this.currentSubreddit.name
-            } else {
-              location.reload()
-            }
-          } catch {}
+          await fetch(API_BASE + `/threads/${id}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${this.token}` }
+          })
+          if (this.currentView === 'thread') {
+            location.href = '/r/' + this.currentSubreddit.name
+          } else {
+            location.reload()
+          }
         },
 
         async deleteComment(id) {
-          try {
-            await fetch(API_BASE + `/comments/${id}`, {
-              method: 'DELETE',
-              headers: { 'Authorization': `Bearer ${this.token}` }
-            })
-            location.reload()
-          } catch {}
+          await fetch(API_BASE + `/comments/${id}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${this.token}` }
+          })
+          location.reload()
         },
 
         async createSubreddit() {
           if (!this.newSubredditName.trim()) return
-          try {
-            await fetch(API_BASE + '/subreddits', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${this.token}`
-              },
-              body: JSON.stringify({ name: this.newSubredditName.trim() })
-            })
-            location.reload()
-          } catch {}
+          await fetch(API_BASE + '/subreddits', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${this.token}`
+            },
+            body: JSON.stringify({ name: this.newSubredditName.trim() })
+          })
+          location.reload()
         },
 
         async createThread() {
-          try {
-            await fetch(API_BASE + '/threads', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${this.token}`
-              },
-              body: JSON.stringify({
-                title: this.newThread.title.trim(),
-                content: this.newThread.content.trim(),
-                subreddit_id: this.currentSubreddit.id,
-              })
+          await fetch(API_BASE + '/threads', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${this.token}`
+            },
+            body: JSON.stringify({
+              title: this.newThread.title.trim(),
+              content: this.newThread.content.trim(),
+              subreddit_id: this.currentSubreddit.id,
             })
-            location.reload()
-          } catch {}
+          })
+          location.reload()
         },
 
         async createComment() {
-          try {
-            await fetch(API_BASE + `/threads/${this.currentThread.id}/comments`, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${this.token}`
-              },
-              body: JSON.stringify({ content: this.newComment.trim(), reply_id: this.replyingTo?.id ?? null })
-            })
-            this.replyingTo = null
-            location.reload()
-          } catch {}
+          await fetch(API_BASE + `/threads/${this.currentThread.id}/comments`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${this.token}`
+            },
+            body: JSON.stringify({ content: this.newComment.trim(), reply_id: this.replyingTo?.id ?? null })
+          })
+          this.replyingTo = null
+          location.reload()
         },
 
         // AI-Generated
