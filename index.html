@@ -516,8 +516,8 @@
         </div>
 
         <div class="modal-footer">
-          <button class="btn btn-ghost" @click="showAuthModal = false">Abbrechen</button>
-          <button class="btn btn-primary" @click="authMode === 'login' ? login() : register()">
+          <button class="button button-ghost" @click="showAuthModal = false">Abbrechen</button>
+          <button class="button button-primary" @click="authMode === 'login' ? login() : register()">
             {{ authMode === 'login' ? 'Anmelden' : 'Konto erstellen' }}
           </button>
         </div>
